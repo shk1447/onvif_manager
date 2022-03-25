@@ -1,0 +1,17 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm install && electron .",
+    "build": "npm install && electron-packager --platform=win32 --icon=./favicon.ico --ignore=^/client --ignore=^/mlprocess --overwrite ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^17.2.0",
+    "electron-packager": "^15.4.0",
+    "electron-prebuilt": "^1.4.13"
+  }
+}
