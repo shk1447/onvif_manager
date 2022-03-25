@@ -1,18 +1,28 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <menu-bar />
   </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+import Vue from "vue";
+import MenuBar from "@/components/MenuBar.vue";
 
-@Options({
+export default Vue.extend({
+  name: "home-view",
   components: {
-    HelloWorld,
+    "menu-bar": MenuBar,
   },
-})
-export default class HomeView extends Vue {}
+  data: () => {
+    return {
+      id: "test",
+    };
+  },
+  created(): void {
+    console.log("test");
+  },
+  mounted(): void {
+    console.log("test");
+  },
+});
 </script>
