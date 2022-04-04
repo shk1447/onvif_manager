@@ -5,11 +5,13 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "watch": "set NODE_ENV=production && vue-cli-service build --watch --mode development"
   },
   "dependencies": {
     "@hscmap/vue-menu": "^2.10.1",
     "core-js": "^3.8.3",
+    "electron": "^18.0.1",
     "golden-layout": "^2.5.0",
     "vue": "^2.6.14",
     "vue-class-component": "^7.2.3",
@@ -19,6 +21,9 @@
     "vuex": "^3.6.2"
   },
   "devDependencies": {
+    "@electron/remote": "^2.0.8",
+    "@mdi/font": "^5.1.45",
+    "@types/electron": "^1.6.10",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "@vue/cli-plugin-babel": "~5.0.0",
@@ -32,10 +37,13 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.0.3",
+    "node-polyfill-webpack-plugin": "^1.1.4",
+    "path-browserify": "^1.0.1",
     "prettier": "^2.4.1",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
     "typescript": "~4.5.5",
-    "vue-template-compiler": "^2.6.14"
+    "vue-template-compiler": "^2.6.14",
+    "webpack-cli": "^4.9.2"
   }
 }

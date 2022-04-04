@@ -1,4 +1,9 @@
 import Vue, { VNode } from "vue";
+interface IElectronAPI {
+  maximize: () => void;
+  minimize: () => void;
+  exit: () => void;
+}
 
 declare global {
   namespace JSX {
@@ -7,5 +12,12 @@ declare global {
     interface IntrinsicElements {
       [elem: string]: any;
     }
+  }
+}
+
+declare module "vue/types/vue" {
+  // 3. Declare augmentation for Vue
+  interface Vue {
+    $electron: IElectronAPI;
   }
 }

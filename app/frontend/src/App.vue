@@ -1,8 +1,31 @@
 <template>
   <v-app>
-    <router-view></router-view>
+    <menu-bar />
+    <!-- <router-view></router-view> -->
   </v-app>
 </template>
+
+<script lang="ts">
+import Vue from "vue";
+import MenuBar from "@/components/MenuBar.vue";
+
+export default Vue.extend({
+  components: {
+    "menu-bar": MenuBar,
+  },
+  data: () => {
+    return {
+      id: "test",
+    };
+  },
+  created(): void {
+    console.log("test");
+  },
+  mounted(): void {
+    console.log("test");
+  },
+});
+</script>
 
 <style lang="scss">
 html,

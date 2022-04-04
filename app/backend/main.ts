@@ -1,13 +1,31 @@
 // const fs = require('fs');
-const path = require('path');
+import path from 'path';
 // const runtime = require('./runtime');
 
 //const demo = require('./demo.js')
 
-const {app, BrowserWindow, ipcMain} = require('electron');
+import {app, BrowserWindow, ipcMain} from 'electron';
 
 console.log(app.getAppPath());
 process.env.root_path = path.resolve(__dirname);
+
+ipcMain.handle('exit', async(event, args) => {
+  app.exit();
+  return false;
+})
+ipcMain.handle('maximize', async(event, args) => {
+  if(mainWindow.isMaximized()) {
+    mainWindow.restore()
+  } else {
+    mainWindow.maximize();
+  }
+  return mainWindow.isMaximized();
+})
+
+ipcMain.handle('minimize', async(event, args) => {
+  mainWindow.minimize();
+  return true;
+})
 
 ipcMain.on('asynchronous-message', (event, arg) => {
     event.sender.send('asynchronous-reply', 'ping')
@@ -20,15 +38,19 @@ ipcMain.on('synchronous-message', (event, arg) => {
     event.returnValue = 'pong'
 })
 
-let mainWindow;
+let mainWindow:BrowserWindow;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
         webPreferences: {
-          blinkFeatures: 'CSSStickyPosition',
+          blinkFeatures: "CSSStickyPosition",
           nodeIntegration:true,
-          enableRemoteModule: true
-        },
+          nodeIntegrationInWorker: false,
+          contextIsolation:false,
+          webSecurity:false,
+          sandbox: false,
+          enableRemoteModule: true,
+        } as any,
         minWidth:1600,
         minHeight:900,
         width: 1600,
@@ -41,7 +63,7 @@ function createWindow() {
         show:false
     });
 
-    mainWindow.loadURL('file://' + __dirname + '/dist/index.html');
+    mainWindow.loadURL('file://' + __dirname + '/index.html');
 
     mainWindow.webContents.openDevTools();
 
