@@ -1,7 +1,7 @@
 // const fs = require('fs');
 import path from 'path';
 // const runtime = require('./runtime');
-var edge = require('electron-edge-js');
+var edge = require('@nomis51/electron-edge-js');
 
 var helloWorld = edge.func(`
     async (input) => {
