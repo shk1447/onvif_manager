@@ -11,9 +11,16 @@ helloWorld('test', function(erro, result) {
 })
 
 
-var dotNetFunction = edge.func('EdgeTest.dll');
+var dotNetFunction = edge.func('EdgeLib.dll');
 
 console.log('aaa');
+dotNetFunction("Test", function(err, result) {
+  if(err) {
+    console.log(err);
+  }
+  console.log(result);
+})
+
 dotNetFunction("Test", function(err, result) {
   if(err) {
     console.log(err);
