@@ -12,6 +12,17 @@ var helloWorld = edge.func(`
 helloWorld('test', function(err:any, result:any) {
   console.log(result);
 })
+
+
+var dotNetFunction = edge.func('EdgeLib.dll');
+
+console.log('aaa');
+dotNetFunction("Test", function(err: any, result: any) {
+  if(err) {
+    console.log(err);
+  }
+  console.log(result);
+})
 //const demo = require('./demo.js')
 
 import {app, BrowserWindow, ipcMain} from 'electron';
