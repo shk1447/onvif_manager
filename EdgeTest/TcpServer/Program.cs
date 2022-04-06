@@ -41,12 +41,18 @@ namespace TcpServer
 
         static void ClientConnected(object sender, ConnectionEventArgs args)
         {
+            Console.WriteLine("Client connected: " + args.IpPort);
+
             var server = sender as WatsonTcpServer;
-            // send a message with metadata
+
+            // send Async
             Dictionary<object, object> md = new Dictionary<object, object>();
             md.Add("foo", "bar");
-            server.Send("[IP:port]", "Hello, client!  Here's some metadata!", md);
-            Console.WriteLine("Client connected: " + args.IpPort);
+            server.Send(args.IpPort, "Hello, client!  Here's some metadata!", md);
+
+            // send Sync
+            SyncResponse resp = server.SendAndWait(5000, args.IpPort, "Hey, say hello back within 5 seconds!");
+            Console.WriteLine(resp.Data);
         }
 
         static void ClientDisconnected(object sender, DisconnectionEventArgs args)
