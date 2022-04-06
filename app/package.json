@@ -2,7 +2,7 @@
   "name": "app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/main.js",
   "scripts": {
     "dev": "tsc-watch --onSuccess \"electron ./dist/main.js\"",
     "start": "npm install && tsc && electron ./dist/main.js",
