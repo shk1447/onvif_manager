@@ -23,6 +23,8 @@
   "dependencies": {
     "@nomis51/electron-edge-js": "^17.0.0",
     "edge-js": "^16.6.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "flv.js": "^1.6.2",
     "onvif": "^0.6.5"
   }
 }
