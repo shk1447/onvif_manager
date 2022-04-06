@@ -1,7 +1,17 @@
 // const fs = require('fs');
 import path from 'path';
 // const runtime = require('./runtime');
+var edge = require('electron-edge-js');
 
+var helloWorld = edge.func(`
+    async (input) => {
+        return ".NET Welcomes " + input.ToString();
+    }
+`);
+
+helloWorld('test', function(err:any, result:any) {
+  console.log(result);
+})
 //const demo = require('./demo.js')
 
 import {app, BrowserWindow, ipcMain} from 'electron';
