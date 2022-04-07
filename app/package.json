@@ -3,28 +3,34 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/main.js",
+  "type": "module",
   "scripts": {
-    "dev": "tsc-watch --onSuccess \"electron ./dist/main.js\"",
-    "start": "npm install && tsc && electron ./dist/main.js",
-    "build": "npm install && tsc && electron-packager --platform=win32 --icon=./favicon.ico --ignore=^/backend --ignore=^/frontend --overwrite ."
+    "start": "node ./builder --watch",
+    "build": "node ./builder && electron-packager --platform=win32 --icon=./favicon.ico --overwrite ./dist"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@electron/remote": "^2.0.8",
+    "commander": "^9.1.0",
     "concurrently": "^7.1.0",
-    "electron": "^17.2.0",
+    "copy-webpack-plugin": "^10.2.4",
     "electron-packager": "^15.4.0",
     "electron-prebuilt": "^1.4.13",
+    "fs": "^0.0.1-security",
     "nodemon": "^2.0.15",
+    "ora": "^6.1.0",
+    "path": "^0.12.7",
+    "ts-loader": "^9.2.8",
     "tsc-watch": "^5.0.2",
-    "typescript": "^4.6.3"
+    "typescript": "^4.6.3",
+    "webpack": "^5.71.0"
   },
   "dependencies": {
     "@nomis51/electron-edge-js": "^17.0.0",
     "edge-js": "^16.6.0",
+    "electron": "^17.2.0",
     "fluent-ffmpeg": "^2.1.2",
-    "flv.js": "^1.6.2",
     "onvif": "^0.6.5"
   }
 }

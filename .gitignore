@@ -109,3 +109,6 @@ dist
 *.sbr
 obj*/
 [Rr]elease*/
+
+# Release
+*-win32-x64

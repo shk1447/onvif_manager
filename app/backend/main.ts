@@ -3,6 +3,9 @@ import path from 'path';
 import {app, BrowserWindow, ipcMain} from 'electron';
 // const runtime = require('./runtime');
 var edge = require('@nomis51/electron-edge-js');
+import test from './test';
+
+console.log(test);
 
 var helloWorld = edge.func(`
     async (input) => {
@@ -15,15 +18,15 @@ helloWorld('test', function(err:any, result:any) {
 })
 
 
-var dotNetFunction = edge.func(path.resolve(app.getAppPath(), './EdgeLib.dll'));
+// var dotNetFunction = edge.func(path.resolve(app.getAppPath(), './modules/EdgeLib.dll'));
 
-console.log('aaa');
-dotNetFunction("Test", function(err: any, result: any) {
-  if(err) {
-    console.log(err);
-  }
-  console.log(result);
-})
+// console.log('aaa');
+// dotNetFunction("Test", function(err: any, result: any) {
+//   if(err) {
+//     console.log(err);
+//   }
+//   console.log(result);
+// })
 //const demo = require('./demo.js')
 
 console.log(app.getAppPath());
