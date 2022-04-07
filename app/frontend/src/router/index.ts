@@ -1,20 +1,24 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import HomeView from "../views/HomeView.vue";
+import MainView from "../views/MainView.vue";
+import SubView from "../views/SubView.vue";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "home",
-    component: HomeView,
+    name: "Main",
+    component: MainView,
+  },
+  {
+    path: "/sub",
+    name: "Sub",
+    component: SubView,
   },
 ];
 
 const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
   routes,
 });
 

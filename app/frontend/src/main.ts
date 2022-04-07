@@ -23,7 +23,6 @@ import * as VueMenu from "@hscmap/vue-menu";
 Vue.use(VueMenu);
 import ElectronAPI from "./electron";
 Vue.prototype.$electron = ElectronAPI;
-Vue.config.productionTip = false;
 
 new Vue({
   router,

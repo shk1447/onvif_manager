@@ -1,14 +1,48 @@
 <template>
   <div class="header-area">
-    <div style="background: rgb(60, 60, 60); height: 32px">
+    <div v-if="isMenu" style="background: rgb(60, 60, 60)">
       <my-theme style="height: 100%">
         <hsc-menu-bar style="height: 100%; border-radius: 0 0 4pt 0">
-          <hsc-menu-bar-item label="File" class="menu-item-wrapper">
-          </hsc-menu-bar-item>
-          <hsc-menu-bar-item label="Group" class="menu-item-wrapper">
-            <hsc-menu-item label="Search" @click="() => {}" />
+          <hsc-menu-bar-item label="Media" class="menu-item-wrapper">
+            <hsc-menu-item label="File" @click="() => {}" />
+            <hsc-menu-item label="Network">
+              <hsc-menu-item label="Discovery Onvif" />
+              <hsc-menu-item label="Input URL" />
+            </hsc-menu-item>
             <hsc-menu-separator />
-            <hsc-menu-item label="Manage" @click="() => {}" />
+            <hsc-menu-item label="Exit" @click="() => {}" />
+          </hsc-menu-bar-item>
+          <hsc-menu-bar-item label="Tool" class="menu-item-wrapper">
+            <hsc-menu-item label="Anomaly Detect" @click="() => {}" />
+            <hsc-menu-item label="Model">
+              <hsc-menu-item label="Model" @click="createWindow" />
+            </hsc-menu-item>
+          </hsc-menu-bar-item>
+          <hsc-menu-bar-item label="View" class="menu-item-wrapper">
+            <hsc-menu-item label="Media List">
+              <hsc-menu-item
+                label="Record"
+                v-model="selectedViews"
+                value="Record"
+              />
+              <hsc-menu-item
+                label="Realtime"
+                v-model="selectedViews"
+                value="Realtime"
+              />
+            </hsc-menu-item>
+
+            <hsc-menu-separator />
+            <hsc-menu-item
+              label="Train Setting"
+              v-model="selectedViews"
+              value="TrainSetting"
+            />
+            <hsc-menu-item
+              label="Inference Chart"
+              v-model="selectedViews"
+              value="InferenceChart"
+            />
           </hsc-menu-bar-item>
           <hsc-menu-bar-item label="Help" class="menu-item-wrapper">
             <hsc-menu-item label="Welcome">
@@ -56,6 +90,14 @@ const separator = {
 
 export default Vue.extend({
   name: "menu-bar",
+  props: {
+    isMenu: {
+      type: Boolean,
+      default() {
+        return true;
+      },
+    },
+  },
   components: {
     "my-theme": StyleFactory({
       menu: {
@@ -77,7 +119,15 @@ export default Vue.extend({
       animation: false,
     }),
   },
+  data() {
+    return {
+      selectedViews: [],
+    };
+  },
   methods: {
+    createWindow() {
+      this.$electron.createWindow("/sub");
+    },
     minimize() {
       this.$electron.minimize();
       // window.minimize();
@@ -94,7 +144,7 @@ export default Vue.extend({
 });
 </script>
 
-<style scoped>
+<style>
 .menu {
   border-radius: 0pt !important;
 }
@@ -118,12 +168,22 @@ export default Vue.extend({
 }
 .header-area {
   min-height: 30px;
-  height: 36px;
+  height: 100%;
   width: 100%;
   background: rgb(60, 60, 60);
   z-index: 10;
   display: flex;
   align-items: center;
-  justify-content: center;
+}
+
+.header-area > div {
+  height: 100% !important;
+}
+
+.menuitem {
+  cursor: pointer;
+  height: 36px !important;
+  align-items: center !important;
+  justify-content: flex-start;
 }
 </style>

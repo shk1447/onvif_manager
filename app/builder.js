@@ -2,6 +2,8 @@ import fs from 'fs';
 import ora from "ora";
 import {resolve} from 'path';
 import webpack from 'webpack';
+import psTree from 'ps-tree';
+import taskkill from 'taskkill';
 
 import {program} from 'commander'
 program
@@ -31,43 +33,46 @@ _package.scripts = {
 }
 
 var config = {
-    watch: watch,
-    entry: resolve('./backend/main.ts'),
-    target: 'node',
-    output: {
-        path: resolve('./dist'),
-        filename: './main.js'
-    },
-    resolve: {
-      extensions:['.ts', '.js']
-    },
-    module: {
-      rules:[{
-        test:/\.ts$/,
-        loader:'ts-loader',
-        exclude:/node_modules/
+  watch: watch,
+  entry: resolve('./backend/main.ts'),
+  target: 'node',
+  output: {
+    path: resolve('./dist'),
+    filename: './main.js'
+  },
+  resolve: {
+    extensions:['.ts', '.js']
+  },
+  module: {
+    rules:[{
+      test:/\.ts$/,
+      loader:'ts-loader',
+      exclude:/node_modules/
+    }]
+  },
+  externals: {
+    "electron":"commonjs electron",
+    "@nomis51/electron-edge-js": 'commonjs @nomis51/electron-edge-js',
+    "fluent-ffmpeg": 'commonjs fluent-ffmpeg',
+    "onvif": 'commonjs onvif'
+  },
+  plugins: [
+    new CopyWebpackPlugin({
+      patterns:[{
+        from: resolve('./modules'),
+        to: resolve('./dist/modules')
       }]
-    },
-    externals: {
-      "electron":"commonjs electron",
-      "@nomis51/electron-edge-js": 'commonjs @nomis51/electron-edge-js',
-      "fluent-ffmpeg": 'commonjs fluent-ffmpeg',
-      "onvif": 'commonjs onvif'
-    },
-    plugins: [
-      new CopyWebpackPlugin({
-        patterns:[{
-          from: resolve('./modules'),
-          to: resolve('./dist/modules')
-        }]
-      }),
-    ]
+    }),
+  ]
 };
 const spinner = ora('building for production...');
 spinner.start();
 
 var child;
 var compiler = webpack(config, (err, stats) => {
+  if(err) {
+    console.log(err);
+  }
   fs.writeFileSync(resolve('./dist/package.json'), JSON.stringify(_package, null, 2));
   spinner.stop();
   console.log('build complete');
@@ -80,19 +85,32 @@ var compiler = webpack(config, (err, stats) => {
   }));
   installer.on('exit', () => {
     if(watch) {
-      var command = 'npm.cmd'
-      var args = ['run', 'start']
-      var options = { cwd: './dist' }
-      child = child_process.spawn(command, args, options);
+      var command = 'node'
+      var args = ['builder.js']
+      var options = { cwd: './' }
+      var builder = child_process.spawn(command, args, options);
   
-      child.stdout.pipe(new Writable({
+      builder.stdout.pipe(new Writable({
         write(chunk, encoding, callback) {
           console.log(chunk.toString());
           callback();
         }
       }));
-      child.on('exit', function () {
-        console.log('process exit')
+      builder.on('exit', function () {
+        var command = 'electron.cmd'
+        var args = ['main.js']
+        var options = { cwd: './dist' }
+        child = child_process.spawn(command, args, options);
+
+        child.stdout.pipe(new Writable({
+          write(chunk, encoding, callback) {
+            console.log(chunk.toString());
+            callback();
+          }
+        }));
+        child.on('exit', function () {
+          console.log('process exit')
+        })
       })
     }
   })
@@ -100,7 +118,15 @@ var compiler = webpack(config, (err, stats) => {
 
 if (watch) {
   compiler.hooks.beforeCompile.tap({ name: 'app' }, (a, b, c) => {
-    child.kill();
+    if(child) {
+      console.log(child.pid)
+      psTree(child.pid, function (err, children) {
+        const input = children.map(function (p) { return p.PID })
+        taskkill(input).then(() => {
+          console.log(`Successfully terminated ${input.join(', ')}`);
+        })
+      });
+    }
     spinner.start();
   })
 }

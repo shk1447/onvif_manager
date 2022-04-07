@@ -1,11 +1,5 @@
-// const fs = require('fs');
-import path from 'path';
 import {app, BrowserWindow, ipcMain} from 'electron';
-// const runtime = require('./runtime');
 var edge = require('@nomis51/electron-edge-js');
-import test from './test';
-
-console.log(test);
 
 var helloWorld = edge.func(`
     async (input) => {
@@ -14,9 +8,8 @@ var helloWorld = edge.func(`
 `);
 
 helloWorld('test', function(err:any, result:any) {
-  console.log(result);
+  console.log("aaa" + result);
 })
-
 
 // var dotNetFunction = edge.func(path.resolve(app.getAppPath(), './modules/EdgeLib.dll'));
 
@@ -29,8 +22,7 @@ helloWorld('test', function(err:any, result:any) {
 // })
 //const demo = require('./demo.js')
 
-console.log(app.getAppPath());
-process.env.root_path = path.resolve(__dirname);
+process.env.app_path = app.getAppPath();
 
 ipcMain.handle('exit', async(event, args) => {
   app.exit();
@@ -50,6 +42,31 @@ ipcMain.handle('minimize', async(event, args) => {
   return true;
 })
 
+ipcMain.handle('createWindow', async(event, args) => {
+  createWindow(args.path, {
+    webPreferences: {
+      blinkFeatures: "CSSStickyPosition",
+      nodeIntegration:true,
+      nodeIntegrationInWorker: false,
+      contextIsolation:false,
+      webSecurity:false,
+      sandbox: false,
+      enableRemoteModule: true,
+    } as any,
+    minWidth:1600,
+    minHeight:900,
+    width: 1600,
+    height: 900,
+    kiosk: false,
+    fullscreen: false,
+    fullscreenable:true,
+    resizable:true,
+    frame:false,
+    show:false
+  });
+  return true;
+})
+
 ipcMain.on('asynchronous-message', (event, arg) => {
     event.sender.send('asynchronous-reply', 'ping')
 
@@ -63,48 +80,45 @@ ipcMain.on('synchronous-message', (event, arg) => {
 
 let mainWindow:BrowserWindow;
 
-function createWindow() {
-    mainWindow = new BrowserWindow({
-        webPreferences: {
-          blinkFeatures: "CSSStickyPosition",
-          nodeIntegration:true,
-          nodeIntegrationInWorker: false,
-          contextIsolation:false,
-          webSecurity:false,
-          sandbox: false,
-          enableRemoteModule: true,
-        } as any,
-        minWidth:1600,
-        minHeight:900,
-        width: 1600,
-        height: 900,
-        kiosk: false,
-        fullscreen: false,
-        fullscreenable:true,
-        resizable:true,
-        frame:false,
-        show:false
-    });
+const createWindow = (path: string, options:Electron.BrowserWindowConstructorOptions) => {
+  var _window = new BrowserWindow(options);
 
-    mainWindow.loadURL('file://' + __dirname + '/index.html');
+  _window.loadURL('file://' + __dirname + '/index.html#' + path);
+  _window.webContents.openDevTools();
 
-    mainWindow.webContents.openDevTools();
-
-    mainWindow.once('ready-to-show', () => {
-      mainWindow.show();
-      mainWindow.webContents.send('asynchronous-reply', '초기 설치 시작');
-    })
-    mainWindow.on('closed', function() {
-        mainWindow = null;
-    });
+  _window.once('ready-to-show', () => {
+    _window.show();
+  })
+  _window.on('closed', function() {
+    _window = null;
+  });
+  return _window;
 }
 
 app.on('window-all-closed', function() {
   if (process.platform != 'darwin') app.quit();
 });
 
-app.on('ready', createWindow);
-
-app.on('activate', function () {
-  if (mainWindow === null) createWindow()
-})
+app.on('ready', () => {
+  mainWindow = createWindow("/",{
+    webPreferences: {
+      blinkFeatures: "CSSStickyPosition",
+      nodeIntegration:true,
+      nodeIntegrationInWorker: false,
+      contextIsolation:false,
+      webSecurity:false,
+      sandbox: false,
+      enableRemoteModule: true,
+    } as any,
+    minWidth:1600,
+    minHeight:900,
+    width: 1600,
+    height: 900,
+    kiosk: false,
+    fullscreen: false,
+    fullscreenable:true,
+    resizable:true,
+    frame:false,
+    show:false
+  })
+});

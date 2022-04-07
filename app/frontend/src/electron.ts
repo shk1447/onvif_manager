@@ -2,6 +2,15 @@ import electron from "electron";
 
 import { IElectronAPI } from "./shims-tsx";
 class ElectronAPI implements IElectronAPI {
+  createWindow(path: string) {
+    electron.ipcRenderer
+      .invoke("createWindow", {
+        path: path,
+      })
+      .then((result) => {
+        console.log(result);
+      });
+  }
   maximize() {
     electron.ipcRenderer.invoke("maximize", {}).then((result) => {
       console.log(result);
@@ -16,7 +25,6 @@ class ElectronAPI implements IElectronAPI {
     electron.ipcRenderer.invoke("exit", {}).then((result) => {
       console.log(result);
     });
-    console.log(electron);
   }
 }
 

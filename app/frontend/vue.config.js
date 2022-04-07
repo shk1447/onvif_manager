@@ -5,15 +5,9 @@ module.exports = defineConfig({
   transpileDependencies: true,
   outputDir: "../dist",
   publicPath: "./",
+  // electron 옵션
   configureWebpack: {
     target: "electron-renderer",
     plugins: [new NodePolyfillPlugin()],
-  },
-  pluginOptions: {
-    electronBuilder: {
-      builderOptions: {
-        productName: "News App",
-      },
-    },
   },
 });
