@@ -58,7 +58,7 @@ var config = {
       new CopyWebpackPlugin({
         patterns:[{
           from: resolve('./modules'),
-          to: resolve('../dist/modules')
+          to: resolve('./dist/modules')
         }]
       }),
     ]
