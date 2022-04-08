@@ -8,23 +8,23 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import MenuBar from "../components/MenuBar.vue";
+import Vue from 'vue';
+import MenuBar from '../components/MenuBar.vue';
 
 export default Vue.extend({
   components: {
-    "menu-bar": MenuBar,
+    'menu-bar': MenuBar,
   },
   data: () => {
     return {
-      id: "test",
+      id: 'test',
     };
   },
   created(): void {
-    console.log("test");
+    console.log('test');
   },
   mounted(): void {
-    console.log("test");
+    console.log('test');
   },
 });
 </script>

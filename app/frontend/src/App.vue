@@ -5,17 +5,17 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue from 'vue';
 
 export default Vue.extend({
   data: () => {
     return {};
   },
   created(): void {
-    console.log("test");
+    console.log('test');
   },
   mounted(): void {
-    console.log("test");
+    console.log('test');
   },
 });
 </script>

@@ -11,6 +11,7 @@
     }
   },
   "include": [
-    "backend/**/*"
-  ]
+    "backend/**/*.ts"
+  ],
+  "exclude": ["node_modules", "frontend"]
 }

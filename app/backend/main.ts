@@ -1,16 +1,4 @@
 import {app, BrowserWindow, ipcMain} from 'electron';
-var edge = require('@nomis51/electron-edge-js');
-
-var helloWorld = edge.func(`
-    async (input) => {
-        return ".NET Welcomes " + input.ToString();
-    }
-`);
-
-helloWorld('test', function(err:any, result:any) {
-  console.log("aaa" + result);
-})
-
 // var dotNetFunction = edge.func(path.resolve(app.getAppPath(), './modules/EdgeLib.dll'));
 
 // console.log('aaa');
@@ -22,12 +10,14 @@ helloWorld('test', function(err:any, result:any) {
 // })
 //const demo = require('./demo.js')
 
+
 process.env.app_path = app.getAppPath();
 
 ipcMain.handle('exit', async(event, args) => {
   app.exit();
   return false;
-})
+});
+
 ipcMain.handle('maximize', async(event, args) => {
   if(mainWindow.isMaximized()) {
     mainWindow.restore()

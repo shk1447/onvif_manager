@@ -1,10 +1,10 @@
-import electron from "electron";
+import electron from 'electron';
 
-import { IElectronAPI } from "./shims-tsx";
+import { IElectronAPI } from './shims-tsx';
 class ElectronAPI implements IElectronAPI {
   createWindow(path: string) {
     electron.ipcRenderer
-      .invoke("createWindow", {
+      .invoke('createWindow', {
         path: path,
       })
       .then((result) => {
@@ -12,17 +12,17 @@ class ElectronAPI implements IElectronAPI {
       });
   }
   maximize() {
-    electron.ipcRenderer.invoke("maximize", {}).then((result) => {
+    electron.ipcRenderer.invoke('maximize', {}).then((result) => {
       console.log(result);
     });
   }
   minimize() {
-    electron.ipcRenderer.invoke("minimize", {}).then((result) => {
+    electron.ipcRenderer.invoke('minimize', {}).then((result) => {
       console.log(result);
     });
   }
   exit() {
-    electron.ipcRenderer.invoke("exit", {}).then((result) => {
+    electron.ipcRenderer.invoke('exit', {}).then((result) => {
       console.log(result);
     });
   }
