@@ -1,4 +1,4 @@
-import Vue, { VNode } from "vue";
+import Vue, { VNode } from 'vue';
 interface IElectronAPI {
   createWindow: (path: string) => void;
   maximize: () => void;
@@ -16,7 +16,7 @@ declare global {
   }
 }
 
-declare module "vue/types/vue" {
+declare module 'vue/types/vue' {
   // 3. Declare augmentation for Vue
   interface Vue {
     $electron: IElectronAPI;

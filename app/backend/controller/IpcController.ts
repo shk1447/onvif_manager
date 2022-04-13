@@ -1,13 +1,9 @@
-import { ipcMain } from 'electron';
+import { ipcMain } from "electron";
 
 export class IpcController {
-  constructor() {
-  }
+  constructor() {}
 
-  create() {
-  }
+  create() {}
 
-  close() {
-    
-  }
+  close() {}
 }

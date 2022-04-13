@@ -1,15 +1,11 @@
-import { ipcMain } from 'electron';
+import { ipcMain } from "electron";
 
 export class TcpController {
-  constructor() {
+  constructor() {}
 
-  }
+  create() {}
 
-  create() {
-
-  }
-
-  close() {
-    
-  }
+  close() {}
 }
+
+export default new TcpController();

@@ -10,6 +10,9 @@
   <Optimize>true</Optimize>
   <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 </PropertyGroup>
+<ItemGroup>
+  <Reference Include="Microsoft.CSharp" />
+</ItemGroup>
 
 
 </Project>

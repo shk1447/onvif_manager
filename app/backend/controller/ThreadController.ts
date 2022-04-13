@@ -1,23 +1,21 @@
-const edge = require('@nomis51/electron-edge-js');
+const edge = require("@nomis51/electron-edge-js");
 
 export class ThreadController {
   constructor() {
     var helloWorld = edge.func(`
-    async (input) => {
-        return ".NET Welcomes " + input.ToString();
-    }
-`);
+      async (input) => {
+          return ".NET Welcomes " + input.ToString();
+      }
+    `);
 
-    helloWorld('test', function(err:any, result:any) {
-  console.log("aaa" + result);
-    })
+    helloWorld("test", function (err: any, result: any) {
+      console.log("aaa" + result);
+    });
   }
 
-  create() {
+  create() {}
 
-  }
-
-  close() {
-    
-  }
+  close() {}
 }
+
+export default new ThreadController();

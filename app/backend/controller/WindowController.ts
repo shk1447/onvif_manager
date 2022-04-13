@@ -1,15 +1,11 @@
-
-
 export class WindowController {
   constructor() {
-
+    console.log("test");
   }
 
-  create() {
+  create() {}
 
-  }
-
-  close() {
-    
-  }
+  close() {}
 }
+
+export default new WindowController();

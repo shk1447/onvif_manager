@@ -7,22 +7,22 @@ class ElectronAPI implements IElectronAPI {
       .invoke('createWindow', {
         path: path,
       })
-      .then((result) => {
+      .then(result => {
         console.log(result);
       });
   }
   maximize() {
-    electron.ipcRenderer.invoke('maximize', {}).then((result) => {
+    electron.ipcRenderer.invoke('maximize', {}).then(result => {
       console.log(result);
     });
   }
   minimize() {
-    electron.ipcRenderer.invoke('minimize', {}).then((result) => {
+    electron.ipcRenderer.invoke('minimize', {}).then(result => {
       console.log(result);
     });
   }
   exit() {
-    electron.ipcRenderer.invoke('exit', {}).then((result) => {
+    electron.ipcRenderer.invoke('exit', {}).then(result => {
       console.log(result);
     });
   }

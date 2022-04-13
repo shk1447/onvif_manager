@@ -73,23 +73,23 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { StyleFactory } from "@hscmap/vue-menu";
+import Vue from 'vue';
+import { StyleFactory } from '@hscmap/vue-menu';
 
 const active = {
-  backgroundColor: "#436f7c",
+  backgroundColor: '#436f7c',
 };
 const disabled = {
-  opacity: "0.5",
+  opacity: '0.5',
 };
 const separator = {
-  backgroundColor: "rgba(240, 240, 240, 0.25)",
-  height: ".5pt",
-  margin: "0pt",
+  backgroundColor: 'rgba(240, 240, 240, 0.25)',
+  height: '.5pt',
+  margin: '0pt',
 };
 
 export default Vue.extend({
-  name: "menu-bar",
+  name: 'menu-bar',
   props: {
     isMenu: {
       type: Boolean,
@@ -99,19 +99,19 @@ export default Vue.extend({
     },
   },
   components: {
-    "my-theme": StyleFactory({
+    'my-theme': StyleFactory({
       menu: {
-        background: "rgb(60,60,60)",
-        color: "white",
-        boxShadow: "0 2pt 4pt rgba(0, 0, 0, 0.5)",
-        padding: "20px",
+        background: 'rgb(60,60,60)',
+        color: 'white',
+        boxShadow: '0 2pt 4pt rgba(0, 0, 0, 0.5)',
+        padding: '20px',
       },
       menubar: {
-        height: "100%",
+        height: '100%',
         background:
-          "linear-gradient(to bottom, rgba(40,40,40,0), rgba(60,60,60,0))",
-        color: "white",
-        boxShadow: "0 4pt 4pt rgba(0, 0, 0, 0)",
+          'linear-gradient(to bottom, rgba(40,40,40,0), rgba(60,60,60,0))',
+        color: 'white',
+        boxShadow: '0 4pt 4pt rgba(0, 0, 0, 0)',
       },
       active,
       disabled,
@@ -126,7 +126,7 @@ export default Vue.extend({
   },
   methods: {
     createWindow() {
-      this.$electron.createWindow("/sub");
+      this.$electron.createWindow('/sub');
     },
     minimize() {
       this.$electron.minimize();

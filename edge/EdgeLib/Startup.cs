@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace EdgeLib
 {
@@ -36,27 +37,47 @@ namespace EdgeLib
 
     public class Startup
     {
-        static int a = 0;
-        public async Task<object> Invoke(dynamic input)
+        public class ConsoleSpiner
         {
-            var aa = new Thread(() =>
+            int counter;
+            public ConsoleSpiner()
             {
-                var loop = true;
-                while(loop)
+                counter = 0;
+            }
+            public void Turn()
+            {
+                counter++;
+                switch (counter % 4)
                 {
-                    if(a > 100)
-                    {
-                        loop = false;
-                        continue;
-                    }
-                    a++;
-                    Console.WriteLine("a count : " + a);
-                    Thread.Sleep(1000);
+                    case 0: Console.Write("/"); break;
+                    case 1: Console.Write("-"); break;
+                    case 2: Console.Write("\\"); break;
+                    case 3: Console.Write("|"); break;
                 }
-            });
-            aa.Start();
+                Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+            }
+        }
+
+        static Thread _thread = new Thread(() =>
+        {
+            ConsoleSpiner spiner = new ConsoleSpiner();
+            while (true)
+            {
+                spiner.Turn();
+                Thread.Sleep(100);
+            }
+        });
+        public async Task<object> Invoke(dynamic input) {
+            if(input.state)
+            {
+                _thread.Start();
+            }
+            else
+            {
+                _thread.Abort();
+            }
             
-            return "Test";
+            return input.state;
         }
     }
 }
