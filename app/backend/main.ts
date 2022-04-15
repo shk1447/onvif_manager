@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain } from "electron";
+
 // var dotNetFunction = edge.func(path.resolve(app.getAppPath(), './modules/EdgeLib.dll'));
 console.log("aaaaa");
 // console.log('aaa');

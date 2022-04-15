@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "af47836a-a275-4475-bbd6-fd219027f5ed": {
+      "ProjectGuid": "af47836a-a275-4475-bbd6-fd219027f5ed",
+      "DisplayName": "EdgeLib",
+      "ColorIndex": 0
+    },
+    "8738b188-83e1-4975-9cf9-ef498d010549": {
+      "ProjectGuid": "8738b188-83e1-4975-9cf9-ef498d010549",
+      "DisplayName": "TcpClient",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}

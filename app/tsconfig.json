@@ -8,10 +8,13 @@
     "baseUrl": ".",
     "paths": {
       "*": ["node_modules/*"]
-    }
+    },
+    "allowJs": true,
+    "declaration": true,
+    "declarationDir": "./backend/types"
   },
   "include": [
-    "backend/**/*.ts"
+    "backend/**/*.ts",
   ],
   "exclude": ["node_modules", "frontend"]
 }
