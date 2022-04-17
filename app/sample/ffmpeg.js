@@ -15,8 +15,11 @@ var command = ffmpeg(path.resolve(__dirname, "./dental_sample.mp4"))
   .videoCodec("copy");
 
 var ffstream = command.pipe();
-ffstream.on("data", function (chunk) {
+ffstream.on("data", (chunk) => {
   console.log("ffmpeg just wrote " + chunk.length + " bytes");
+});
+ffstream.on("end", () => {
+  console.log("end2");
 });
 
 // setInterval(() => {}, 1000);

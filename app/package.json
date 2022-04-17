@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/main.js",
-  
   "scripts": {
     "watch": "node ./builder --watch",
     "build": "node ./builder && electron-packager --platform=win32 --icon=./favicon.ico --overwrite ./dist"
@@ -12,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@electron/remote": "^2.0.8",
+    "@types/fluent-ffmpeg": "^2.1.20",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "cli-spinners": "^2.6.1",
