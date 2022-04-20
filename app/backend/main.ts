@@ -17,6 +17,30 @@ import ThreadController from "./controller/ThreadController";
 console.log(ThreadController);
 process.env.app_path = app.getAppPath();
 
+import onvif from "onvif";
+
+ipcMain.handle("discovery", async (event, args) => {
+  console.log("testestestset");
+  onvif.Discovery.on("device", function (cam) {
+    cam.username = "admin";
+    cam.password = "admin1357";
+    cam.connect(() => {
+      try {
+        cam.getStreamUri({ protocol: "RTSP" }, (err: any, stream: any) => {
+          console.log(stream);
+        });
+      } catch (error) {
+        console.log(cam.hostname);
+        // console.log(error);
+      }
+    });
+  });
+  onvif.Discovery.probe({}, () => {
+    console.log("end");
+  });
+  return false;
+});
+
 ipcMain.handle("exit", async (event, args) => {
   app.exit();
   return false;
@@ -68,6 +92,7 @@ ipcMain.on("asynchronous-message", (event, arg) => {
 });
 
 ipcMain.on("synchronous-message", (event, arg) => {
+  console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   console.log(arg); // "ping" 출력
   event.returnValue = "pong";
 });
@@ -85,6 +110,10 @@ const createWindow = (
 
   _window.once("ready-to-show", () => {
     _window.show();
+    console.log("show!!!");
+    setTimeout(() => {
+      mainWindow.webContents.send("test", "test");
+    }, 1000);
   });
   _window.on("closed", function () {
     _window = null;

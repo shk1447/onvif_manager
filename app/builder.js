@@ -34,7 +34,7 @@ var config = {
   entry: resolve("./backend/main.ts"),
   target: "node",
   output: {
-    path: resolve("./dist"),
+    path: resolve("../dist"),
     filename: "./main.js",
   },
   resolve: {
@@ -60,7 +60,7 @@ var config = {
       patterns: [
         {
           from: resolve("./modules"),
-          to: resolve("./dist/modules"),
+          to: resolve("../dist/modules"),
         },
       ],
     }),
@@ -72,12 +72,15 @@ spinner.start();
 var child, installer, builder;
 var compiler = webpack(config, (err, stats) => {
   if (err) {
-    console.log(err);
+    // console.log(err);
   }
+  console.error(stats.compilation.errors);
+  console.log(stats.compilation.errors.length);
   fs.writeFileSync(
-    resolve("./dist/package.json"),
+    resolve("../dist/package.json"),
     JSON.stringify(_package, null, 2)
   );
+  spinner.stop();
 });
 
 const killProcess = (process) => {
@@ -112,29 +115,34 @@ if (watch) {
   );
   compiler.hooks.afterDone.tap("my-plugin", async () => {
     installer = spawnSync("npm.cmd", ["install"], {
-      cwd: "./dist",
+      cwd: "../dist",
     });
     console.log(installer.stdout.toString("utf-8"));
+
     builder = spawnSync("node", ["builder.js"], { cwd: "./" });
-    console.log(builder.stdout.toString("utf-8"));
 
-    if (child) await killProcess(child);
-    var command = "electron.cmd";
-    var args = ["main.js"];
-    var options = { cwd: "./dist" };
-    child = spawn(command, args, options);
+    var error = parseInt(builder.stdout.toString("utf-8"));
+    if (error > 0) {
+      console.log("error가 있습니다.");
+      process.exit();
+    } else {
+      if (child) await killProcess(child);
+      var command = "electron.cmd";
+      var args = ["main.js"];
+      var options = { cwd: "../dist" };
+      child = spawn(command, args, options);
 
-    child.stdout.pipe(
-      new Writable({
-        write(chunk, encoding, callback) {
-          console.log(chunk.toString());
-          callback();
-        },
-      })
-    );
-    child.on("exit", function () {
-      console.log("process exit");
-    });
-    spinner.stop();
+      child.stdout.pipe(
+        new Writable({
+          write(chunk, encoding, callback) {
+            console.log(chunk.toString());
+            callback();
+          },
+        })
+      );
+      child.on("exit", function () {
+        console.log("process exit");
+      });
+    }
   });
 }

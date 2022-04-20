@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/main.js",
+  "type": "module",
   "scripts": {
     "watch": "node ./builder --watch",
-    "build": "node ./builder && electron-packager --platform=win32 --icon=./favicon.ico --overwrite ./dist"
+    "build": "node ./builder && electron-packager --platform=win32 --icon=./favicon.ico --overwrite ../dist"
   },
   "author": "",
   "license": "ISC",
@@ -40,6 +41,7 @@
     "edge-js": "^16.6.0",
     "electron": "^17.2.0",
     "fluent-ffmpeg": "^2.1.2",
+    "node-onvif": "^0.1.7",
     "onvif": "^0.6.5"
   }
 }

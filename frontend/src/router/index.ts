@@ -1,20 +1,20 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
-import MainView from '../views/MainView.vue';
-import SubView from '../views/SubView.vue';
+import ClientView from '../views/ClientView.vue';
+import TrainView from '../views/TrainView.vue';
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Main',
-    component: MainView,
+    name: 'Client',
+    component: ClientView,
   },
   {
-    path: '/sub',
-    name: 'Sub',
-    component: SubView,
+    path: '/train',
+    name: 'Train',
+    component: TrainView,
   },
 ];
 

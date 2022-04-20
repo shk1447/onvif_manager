@@ -11,10 +11,10 @@
     },
     "allowJs": true,
     "declaration": true,
-    "declarationDir": "./backend/types"
+    "declarationDir": "./types"
   },
   "include": [
     "backend/**/*.ts",
   ],
-  "exclude": ["node_modules", "frontend"]
+  "exclude": ["node_modules", "../frontend"]
 }

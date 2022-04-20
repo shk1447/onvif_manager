@@ -8,6 +8,7 @@ import Vuetify from 'vuetify';
 import { Iconfont } from 'vuetify/types/services/icons';
 import 'vuetify/dist/vuetify.min.css';
 import '@mdi/font/css/materialdesignicons.css';
+
 Vue.use(Vuetify);
 const opts = {
   icons: {
@@ -23,6 +24,8 @@ import * as VueMenu from '@hscmap/vue-menu';
 Vue.use(VueMenu);
 import ElectronAPI from './electron';
 Vue.prototype.$electron = ElectronAPI;
+
+// ElectronAPI.on();
 
 new Vue({
   router,

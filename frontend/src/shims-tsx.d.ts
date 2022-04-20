@@ -1,9 +1,11 @@
 import Vue, { VNode } from 'vue';
+
 interface IElectronAPI {
   createWindow: (path: string) => void;
   maximize: () => void;
   minimize: () => void;
   exit: () => void;
+  discovery: () => void;
 }
 
 declare global {

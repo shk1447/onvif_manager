@@ -1,6 +1,6 @@
 declare module "onvif" {
   interface EventMap {
-    device: (cam: any, rinfo: any, xml: any) => void;
+    device: (cam: ICam, rinfo: any, xml: any) => void;
     error: (err: any, xml: any) => void;
   }
 
@@ -26,7 +26,7 @@ declare module "onvif" {
       event: Name,
       func: EventMap[Name]
     ) => void;
-    probe: (options: any, callback: (err: any, cams: any) => void) => void;
+    probe: (options?: any, callback?: (err: any, cams: ICam[]) => void) => void;
   }
   interface IOnvif {
     Discovery: IDiscovery;

@@ -24,11 +24,25 @@ export default Vue.extend({
 html,
 body {
   overflow: hidden !important;
+  font-size: 16px;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
+}
+
+.v-list {
+  padding: 0px !important;
+}
+
+.menu-item-wrapper .fixed .menu {
+  border-radius: 0pt !important;
+  padding: 0pt !important;
+}
+
+.menu-item-wrapper .fixed .menu .menuitem {
+  padding: 4px 8pt 4px 4pt;
+  cursor: pointer;
 }
 </style>
