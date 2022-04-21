@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import RtspVideo from './contents/RtspVideo.vue';
+import EventBus from '../EventBus';
 
 import {
   ComponentContainer,
@@ -28,6 +29,13 @@ export default Vue.extend<any, any, any, IContentLayout>({
       this.gl && this.gl.updateSize();
     },
   },
+  created() {
+    console.log(this.$on);
+    EventBus.$on('addContent', (payload: any) => {
+      this.gl.addComponent('example', payload, payload.name);
+      console.log(payload);
+    });
+  },
   mounted() {
     var gl: GoldenLayout = new GoldenLayout(this.$refs.layout as HTMLElement);
     gl.registerComponentFactoryFunction(
@@ -37,10 +45,8 @@ export default Vue.extend<any, any, any, IContentLayout>({
         state: JsonValue | undefined,
         virtual: boolean,
       ) => {
-        var aa = new RtspVideo({
-          data: {
-            url: 'https://www.w3schools.com/html/mov_bbb.mp4',
-          },
+        new RtspVideo({
+          data: state,
         }).$mount(container.element);
       },
     );
@@ -52,10 +58,10 @@ export default Vue.extend<any, any, any, IContentLayout>({
     } as LayoutConfig);
 
     this.gl = gl;
-    gl.addComponent('example', {}, 'test');
-    gl.addComponent('example', {}, 'test2');
-    gl.addComponent('example', {}, 'test3');
-    gl.addComponent('example', {}, 'test4');
+    // gl.addComponent('example', {}, 'test');
+    // gl.addComponent('example', {}, 'test2');
+    // gl.addComponent('example', {}, 'test3');
+    // gl.addComponent('example', {}, 'test4');
   },
 });
 </script>

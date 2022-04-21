@@ -15,13 +15,18 @@ onvif.Discovery.on("device", function (cam) {
     }
   });
 });
-onvif.Discovery.probe(() => {
-  console.log("end");
+onvif.Discovery.on("error", function (err, xml) {
+  // function called as soon as NVT responds, but this library could not parse the response
+  console.log("Discovery error " + err);
 });
+onvif.Discovery.probe();
 
-// var test = new onvif.Cam({hostname:'170.101.20.226', username:'admin', password:'admin1357'}, function(test) {
-//     console.log('test')
-//     this.getStreamUri({protocol: 'RTSP'}, function(err, stream) {
-// 		console.log(stream);
-// 	});
-// });
+var test = new onvif.Cam(
+  { hostname: "170.101.20.211", username: "admin", password: "admin1357" },
+  function (test) {
+    // console.log(test);
+    this.getStreamUri({ protocol: "RTSP" }, function (err, stream) {
+      // console.log(stream);
+    });
+  }
+);

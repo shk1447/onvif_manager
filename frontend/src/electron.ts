@@ -18,9 +18,7 @@ class ElectronAPI implements IElectronAPI {
       });
   }
   maximize() {
-    electron.ipcRenderer.invoke('maximize', {}).then(result => {
-      console.log(result);
-    });
+    return electron.ipcRenderer.invoke('maximize', {});
   }
   minimize() {
     electron.ipcRenderer.invoke('minimize', {}).then(result => {
@@ -38,8 +36,8 @@ class ElectronAPI implements IElectronAPI {
   off(channel: string, callback: (event: any, data: any) => void) {
     electron.ipcRenderer.off(channel, callback);
   }
-  emit(channel: string, data: any) {
-    electron.ipcRenderer.emit(channel, data);
+  send(channel: string, data: any) {
+    electron.ipcRenderer.send(channel, data);
   }
 }
 

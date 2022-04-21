@@ -2,9 +2,17 @@ const path = require("path");
 const ffmpeg = require("fluent-ffmpeg");
 const { Writable } = require("stream");
 
+var cmd = ffmpeg("rtsp://admin:admin1357@170.101.20.211:554/stream1")
+  .outputFormat("flv")
+  .outputFps(25)
+  .audioCodec("copy")
+  .videoCodec("copy")
+  .pipe();
+cmd.on("data", (chunk) => {
+  console.log("ffmpeg just wrote " + chunk.length + " bytes");
+});
 
-var cmd = ffmpeg().input("rtsp://admin:admin1357@170.101.20.211:554/stream1").output("test2.mp4")
-console.log(cmd);
+// console.log(cmd);
 // ffmpeg(path.resolve(__dirname, "./dental_sample.mp4"))
 //   .on("start", () => {
 //     console.log("start");
@@ -29,4 +37,4 @@ console.log(cmd);
 //   console.log("end2");
 // });
 
-setInterval(() => {}, 1000);
+// setInterval(() => {}, 1000);

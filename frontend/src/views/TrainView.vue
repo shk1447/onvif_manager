@@ -1,20 +1,19 @@
 <template>
   <div class="grid-container">
-    <div class="grid-header">
-      <menu-bar />
+    <div class="grid-header"></div>
+    <div class="grid-body">
+      <div style="display: flex; justify-content: center; align-items: center">
+        Inference App Manager!!!!!!
+      </div>
     </div>
-    <div class="grid-body"></div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import MenuBar from '../components/MenuBar.vue';
 
 export default Vue.extend({
-  components: {
-    'menu-bar': MenuBar,
-  },
+  components: {},
   data: () => {
     return {
       id: 'test',

@@ -15,29 +15,24 @@ console.log(WindowController);
 
 import ThreadController from "./controller/ThreadController";
 console.log(ThreadController);
+
+import { discovery } from "./methods/onvif";
+import { start, stop } from "./methods/ffmpeg";
+
 process.env.app_path = app.getAppPath();
 
-import onvif from "onvif";
+ipcMain.on("rtsp/start", async (event, args) => {
+  start(args);
+});
+
+ipcMain.on("rtsp/stop", async (event, args) => {
+  stop(args);
+});
 
 ipcMain.handle("discovery", async (event, args) => {
-  console.log("testestestset");
-  onvif.Discovery.on("device", function (cam) {
-    cam.username = "admin";
-    cam.password = "admin1357";
-    cam.connect(() => {
-      try {
-        cam.getStreamUri({ protocol: "RTSP" }, (err: any, stream: any) => {
-          console.log(stream);
-        });
-      } catch (error) {
-        console.log(cam.hostname);
-        // console.log(error);
-      }
-    });
-  });
-  onvif.Discovery.probe({}, () => {
-    console.log("end");
-  });
+  discovery();
+  console.log(event.sender);
+  event.sender.send("discovery", "test");
   return false;
 });
 
@@ -85,19 +80,19 @@ ipcMain.handle("createWindow", async (event, args) => {
   return true;
 });
 
-ipcMain.on("asynchronous-message", (event, arg) => {
-  event.sender.send("asynchronous-reply", "ping");
+// ipcMain.on("asynchronous-message", (event, arg) => {
+//   event.sender.send("asynchronous-reply", "ping");
 
-  console.log(arg);
-});
+//   console.log(arg);
+// });
 
-ipcMain.on("synchronous-message", (event, arg) => {
-  console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-  console.log(arg); // "ping" 출력
-  event.returnValue = "pong";
-});
+// ipcMain.on("synchronous-message", (event, arg) => {
+//   console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+//   console.log(arg); // "ping" 출력
+//   event.returnValue = "pong";
+// });
 
-let mainWindow: BrowserWindow;
+export let mainWindow: BrowserWindow;
 
 const createWindow = (
   path: string,

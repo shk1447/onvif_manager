@@ -1,5 +1,10 @@
 const onvif = require("node-onvif");
 
+onvif.startDiscovery((info) => {
+  // Show the information of the found device
+  console.log(JSON.stringify(info, null, "  "));
+});
+
 console.log("Start the discovery process.");
 // Find the ONVIF network cameras.
 // It will take about 3 seconds.

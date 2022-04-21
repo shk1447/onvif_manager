@@ -6,7 +6,7 @@
       </div>
       <v-spacer></v-spacer>
       <v-hover v-slot:default="{ hover }">
-        <div v-on="on" style="padding: 0em 0em 0em 0.5em; cursor: pointer">
+        <div style="padding: 0em 0em 0em 0.5em; cursor: pointer">
           <v-icon
             @click="handleDiscovery"
             small
@@ -57,6 +57,7 @@
       ref="ref_obj_list"
     >
       <v-treeview
+        ref="tree"
         :items="children"
         item-key="id"
         item-text="name"
@@ -68,19 +69,15 @@
         v-if="children.length"
       >
         <template v-slot:prepend="{ item }">
-          <v-icon
-            small
-            color="hsla(0, 0%, 100%, 0.85)"
-            v-if="item.content_type === 'table'"
-          >
-            {{ 'mdi-table' }}
+          <v-icon small color="hsla(0, 0%, 100%, 0.85)" v-if="item.children">
+            {{ 'mdi-folder' }}
           </v-icon>
           <v-icon
-            small
+            style="font-size: 20px"
             color="hsla(0, 0%, 100%, 0.85)"
-            v-else-if="item.content_type === 'flow'"
+            v-else-if="item.type === 'rtsp'"
           >
-            {{ 'mdi-graph' }}
+            {{ 'mdi-video-outline' }}
           </v-icon>
         </template>
         <template v-slot:label="{ item }">
@@ -92,14 +89,32 @@
               height: 100%;
               cursor: pointer;
               color: hsla(0, 0%, 100%, 0.85);
+              font-size: 0.8rem;
+              user-select: none;
             "
             @dblclick="onLoadContent(item)"
           >
             {{ item.name }}
           </div>
         </template>
+
         <template v-slot:append="{ item }">
-          <v-tooltip right v-if="item.id != 'root'">
+          <v-tooltip right v-if="!item.children">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                color="hsla(0, 0%, 100%, 0.85)"
+                @click="handleRecord(item)"
+                v-on="on"
+                small
+                :class="item.record ? 'recording' : ''"
+                style="margin-right: 4px"
+                >mdi-record-circle-outline</v-icon
+              >
+            </template>
+            <span>Record</span>
+          </v-tooltip>
+
+          <!-- <v-tooltip right v-if="item.id != 'root'">
             <template v-slot:activator="{ on }">
               <v-icon
                 color="hsla(0, 0%, 100%, 0.85)"
@@ -110,7 +125,7 @@
               >
             </template>
             <span>Delete</span>
-          </v-tooltip>
+          </v-tooltip> -->
         </template>
       </v-treeview>
     </div>
@@ -119,6 +134,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import EventBus from '../EventBus';
 export default Vue.extend({
   data() {
     return {
@@ -145,12 +161,40 @@ export default Vue.extend({
       console.log(item);
     },
     async onLoadContent(item: any) {
-      console.log(item);
+      EventBus.$emit('addContent', item);
     },
+    updateResource(event: any, data: any) {
+      this.children = [
+        {
+          id: 'root01',
+          name: 'Rtsp Video',
+          children: data.map((item: any) => {
+            item.record = false;
+            return item;
+          }) as any,
+        },
+        {
+          id: 'root02',
+          name: 'Record Video',
+          children: [] as any,
+        },
+      ] as any;
+      console.log(data);
+      console.log(this.$refs.tree);
+    },
+    handleRecord(item: any) {
+      item.record = !item.record;
+    },
+  },
+  created() {
+    this.$electron.on('discovery', this.updateResource);
+  },
+  mounted() {
+    this.handleDiscovery();
   },
 });
 </script>
-<style scoped>
+<style>
 .content-tree-view {
   height: 100%;
   color: hsla(0, 0%, 100%, 0.7);
@@ -166,6 +210,15 @@ export default Vue.extend({
   box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.1), 0 2px 2px 0 rgba(0, 0, 0, 0.05),
     0 1px 5px 0 rgba(0, 0, 0, 0.1);
 }
+.content-tree-view .v-treeview-node__prepend {
+  display: flex;
+  align-items: center;
+}
+
+.content-tree-view .v-treeview-node__append {
+  display: flex;
+  align-items: center;
+}
 
 .expand-content {
   width: 100%;
@@ -178,5 +231,23 @@ export default Vue.extend({
   height: auto;
   min-height: 250px;
   visibility: visible;
+}
+
+.recording {
+  animation-name: blink;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+  0% {
+    color: hsla(0, 0%, 100%, 0.85);
+  }
+  50% {
+    color: red;
+  }
+  100% {
+    color: hsla(0, 0%, 100%, 0.85);
+  }
 }
 </style>

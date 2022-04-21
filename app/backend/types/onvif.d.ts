@@ -1,3 +1,8 @@
+declare module "websocket-stream/stream" {
+  const test: any;
+  export default test;
+}
+
 declare module "onvif" {
   interface EventMap {
     device: (cam: ICam, rinfo: any, xml: any) => void;

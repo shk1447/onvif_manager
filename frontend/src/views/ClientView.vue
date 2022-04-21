@@ -46,6 +46,7 @@ export default Vue.extend({
   grid-template-rows: repeat(auto-fill, minmax(1%, auto));
 }
 .grid-header {
+  z-index: 999999999;
   grid-column: 1/ 101;
   grid-row: 1/6;
 }

@@ -4,31 +4,29 @@
       <my-theme style="height: 100%">
         <hsc-menu-bar style="height: 100%; border-radius: 0 0 4pt 0">
           <hsc-menu-bar-item label="Media" class="menu-item-wrapper">
-            <hsc-menu-item label="File" @click="() => {}" />
-            <hsc-menu-item label="Network">
-              <hsc-menu-item label="Discovery Onvif" />
-              <hsc-menu-item label="Input URL" />
+            <hsc-menu-item label="File">
+              <hsc-menu-item label="Save" value="Save" />
+              <hsc-menu-item label="Load" value="Load" />
             </hsc-menu-item>
+            <hsc-menu-item label="Discovery Camera" />
             <hsc-menu-separator />
             <hsc-menu-item label="Exit" @click="() => {}" />
           </hsc-menu-bar-item>
-          <hsc-menu-bar-item label="Tool" class="menu-item-wrapper">
-            <hsc-menu-item label="Anomaly Detect" @click="() => {}" />
-            <hsc-menu-item label="Model">
-              <hsc-menu-item label="Model" @click="createWindow" />
-            </hsc-menu-item>
+          <hsc-menu-bar-item label="Manager" class="menu-item-wrapper">
+            <hsc-menu-item label="Inference App" @click="createWindow" />
+            <hsc-menu-item label="NVR" @click="createWindow" />
           </hsc-menu-bar-item>
           <hsc-menu-bar-item label="View" class="menu-item-wrapper">
-            <hsc-menu-item label="Media List">
+            <hsc-menu-item label="Resources">
               <hsc-menu-item
-                label="Record"
+                label="Record Video"
                 v-model="selectedViews"
-                value="Record"
+                value="RecordVideo"
               />
               <hsc-menu-item
-                label="Realtime"
+                label="Rtsp Video"
                 v-model="selectedViews"
-                value="Realtime"
+                value="RtspVideo"
               />
             </hsc-menu-item>
 
@@ -60,13 +58,15 @@
     </div>
     <v-spacer style="-webkit-app-region: drag; height: 100%" />
 
-    <div class="action-item-wrapper" @click="minimize">
+    <div class="action-item-wrapper" @click="handleMinimize">
       <v-icon small>mdi-window-minimize</v-icon>
     </div>
-    <div class="action-item-wrapper" @click="maximize">
-      <v-icon small>mdi-window-maximize</v-icon>
+    <div class="action-item-wrapper" @click="handleMaximize">
+      <v-icon small>{{
+        !maximize ? 'mdi-window-maximize' : 'mdi-window-restore'
+      }}</v-icon>
     </div>
-    <div class="action-item-wrapper" @click="exit">
+    <div class="action-item-wrapper" @click="handleExit">
       <v-icon small>mdi-window-close</v-icon>
     </div>
   </div>
@@ -121,22 +121,25 @@ export default Vue.extend({
   },
   data() {
     return {
+      maximize: false,
       selectedViews: [],
     };
   },
   methods: {
     createWindow() {
-      this.$electron.createWindow('/sub');
+      this.$electron.createWindow('/train');
     },
-    minimize() {
+    handleMinimize() {
       this.$electron.minimize();
       // window.minimize();
     },
-    maximize() {
+    handleMaximize() {
       // window.maximize();
-      this.$electron.maximize();
+      this.$electron.maximize().then((result: any) => {
+        this.maximize = result;
+      });
     },
-    exit() {
+    handleExit() {
       this.$electron.exit();
       // window.exit();
     },
