@@ -2,9 +2,9 @@ import Vue, { VNode } from 'vue';
 
 interface IElectronAPI {
   createWindow: (path: string) => void;
-  maximize: () => Promise<any>;
-  minimize: () => void;
-  exit: () => void;
+  maximize: (path: string) => Promise<any>;
+  minimize: (path: string) => void;
+  exit: (path: string) => void;
   discovery: () => void;
   on: (channel: string, callback: (event: any, data: any) => void) => void;
   off: (channel: string, callback: (event: any, data: any) => void) => void;

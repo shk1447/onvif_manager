@@ -17,12 +17,12 @@ interface IRtspVideo {
 export default Vue.extend<IRtspVideo, any, any, any>({
   created() {
     console.log(this.name);
-    this.$electron.send('rtsp/start', {
-      name: this.name,
-      stream_url: this.stream_url,
-      username: this.username,
-      password: this.password,
-    });
+    // this.$electron.send('inspect/start', {
+    //   name: this.name,
+    //   stream_url: this.stream_url,
+    //   username: this.username,
+    //   password: this.password,
+    // });
   },
   mounted() {
     if (flvjs.isSupported()) {
@@ -43,14 +43,18 @@ export default Vue.extend<IRtspVideo, any, any, any>({
       }
     }
   },
-  destroyed() {
-    console.log('destroy:!@!');
-    this.$electron.send('rtsp/stop', {
-      name: this.name,
-      stream_url: this.stream_url,
-      username: this.username,
-      password: this.password,
-    });
+  methods: {
+    destroyPlayer() {
+      this.player.destroy();
+    },
+  },
+  beforeDestroy() {
+    // this.$electron.send('inspect/stop', {
+    //   name: this.name,
+    //   stream_url: this.stream_url,
+    //   username: this.username,
+    //   password: this.password,
+    // });
   },
 });
 </script>

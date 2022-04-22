@@ -1,6 +1,6 @@
 import onvif from "onvif";
 import { networkInterfaces } from "os";
-import { mainWindow } from "../main";
+import { WindowManager } from "./electron";
 
 const username = "admin";
 const password = "admin1357";
@@ -23,7 +23,8 @@ onvif.Discovery.on("device", function (cam) {
           password: cam.password,
           stream_url: stream.uri,
         });
-        mainWindow.webContents.send("discovery", cams);
+
+        WindowManager.windows["/"].webContents.send("discovery", cams);
       });
     } catch (error) {
       console.log(cam.hostname);
@@ -71,7 +72,7 @@ export const custom_discovery = () => {
               password: cam.password,
               stream_url: stream.uri,
             });
-            mainWindow.webContents.send("discovery", _cams);
+            WindowManager.windows["/"].webContents.send("discovery", cams);
           });
         })
         .catch((ip: string) => {});

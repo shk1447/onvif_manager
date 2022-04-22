@@ -1,7 +1,59 @@
-export const exit = () => {};
+import { app, BrowserWindow } from "electron";
+interface IWindowManager {
+  windows: { [path: string]: BrowserWindow };
+  create: (
+    path: string,
+    options: Electron.BrowserWindowConstructorOptions
+  ) => BrowserWindow;
+  minimize: (path: string) => boolean;
+  maximize: (path: string) => boolean;
+  exit: (path: string) => boolean;
+}
 
-export const maximize = () => {};
+class _WindowManager implements IWindowManager {
+  windows: any;
+  constructor() {
+    this.windows = {};
+  }
+  create = (
+    path: string,
+    options: Electron.BrowserWindowConstructorOptions
+  ) => {
+    if (this.windows[path]) return this.windows[path];
+    var _window = new BrowserWindow(options);
 
-export const minimize = () => {};
+    _window.loadURL("file://" + __dirname + "/index.html#" + path);
+    _window.webContents.openDevTools();
 
-export const window = () => {};
+    _window.once("ready-to-show", () => {
+      _window.show();
+    });
+    _window.on("closed", function () {
+      _window = null;
+    });
+    this.windows[path] = _window;
+    return _window;
+  };
+  minimize = (path: string) => {
+    this.windows[path].minimize();
+    return true;
+  };
+  maximize = (path: string) => {
+    if (this.windows[path].isMaximized()) {
+      this.windows[path].restore();
+    } else {
+      this.windows[path].maximize();
+    }
+    return this.windows[path].isMaximized();
+  };
+  exit = (path: string) => {
+    if (path === "/") {
+      app.exit();
+    } else {
+      this.windows[path].close();
+      delete this.windows[path];
+    }
+    return true;
+  };
+}
+export const WindowManager = new _WindowManager();

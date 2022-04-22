@@ -141,17 +141,19 @@ export default Vue.extend<IMenuState, any, any, IMenuProps>({
       this.$electron.createWindow('/train');
     },
     handleMinimize() {
-      this.$electron.minimize();
+      this.$electron.minimize(this.$router.currentRoute.path);
       // window.minimize();
     },
     handleMaximize() {
       // window.maximize();
-      this.$electron.maximize().then((result: any) => {
-        this.maximize = result;
-      });
+      this.$electron
+        .maximize(this.$router.currentRoute.path)
+        .then((result: any) => {
+          this.maximize = result;
+        });
     },
     handleExit() {
-      this.$electron.exit();
+      this.$electron.exit(this.$router.currentRoute.path);
       // window.exit();
     },
   },

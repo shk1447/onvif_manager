@@ -1,5 +1,6 @@
 import express from "express";
 import expressWebSocket from "express-ws";
+import { RtspService } from "./services/rtsp";
 
 let app = express();
 
@@ -9,6 +10,6 @@ let ws = expressWebSocket(app, null, {
   perMessageDeflate: true,
 } as any);
 
-app.listen(9090);
+new RtspService(ws.app);
 
-export default ws.app;
+app.listen(9090);

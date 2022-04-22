@@ -30,10 +30,8 @@ export default Vue.extend<any, any, any, IContentLayout>({
     },
   },
   created() {
-    console.log(this.$on);
     EventBus.$on('addContent', (payload: any) => {
       this.gl.addComponent('example', payload, payload.name);
-      console.log(payload);
     });
   },
   mounted() {
@@ -45,9 +43,10 @@ export default Vue.extend<any, any, any, IContentLayout>({
         state: JsonValue | undefined,
         virtual: boolean,
       ) => {
-        new RtspVideo({
+        var content = new RtspVideo({
           data: state,
         }).$mount(container.element);
+        (container as any)['_content'] = content;
       },
     );
     gl.loadLayout({
@@ -56,6 +55,18 @@ export default Vue.extend<any, any, any, IContentLayout>({
         content: [] as ComponentItemConfig[],
       },
     } as LayoutConfig);
+
+    gl.on('stateChanged', () => {
+      console.log('state changed');
+    });
+    gl.on('beforeItemDestroyed', (item: any) => {
+      if (item.origin._container) {
+        item.origin._container._content.destroyPlayer();
+        setTimeout(() => {
+          item.origin._container._content.$destroy();
+        }, 0);
+      }
+    });
 
     this.gl = gl;
     // gl.addComponent('example', {}, 'test');

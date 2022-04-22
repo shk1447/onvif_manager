@@ -17,16 +17,18 @@ class ElectronAPI implements IElectronAPI {
         console.log(result);
       });
   }
-  maximize() {
-    return electron.ipcRenderer.invoke('maximize', {});
+  maximize(path: string) {
+    return electron.ipcRenderer.invoke('maximize', {
+      path: path,
+    });
   }
-  minimize() {
-    electron.ipcRenderer.invoke('minimize', {}).then(result => {
+  minimize(path: string) {
+    electron.ipcRenderer.invoke('minimize', { path: path }).then(result => {
       console.log(result);
     });
   }
-  exit() {
-    electron.ipcRenderer.invoke('exit', {}).then(result => {
+  exit(path: string) {
+    electron.ipcRenderer.invoke('exit', { path: path }).then(result => {
       console.log(result);
     });
   }

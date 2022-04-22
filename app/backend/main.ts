@@ -1,5 +1,21 @@
-import { app, BrowserWindow, ipcMain } from "electron";
 import { resolve } from "path";
+import { app, BrowserWindow, ipcMain } from "electron";
+import unhandled from "electron-unhandled";
+
+unhandled({
+  logger: (err: Error) => {
+    if (err) console.log("occured unhandled error!");
+  },
+  showDialog: false,
+  reportButton: (error) => {
+    console.log("Report Button Initialized");
+  },
+});
+
+import "./app";
+
+import { WindowManager } from "./methods/electron";
+
 // var dotNetFunction = edge.func(path.resolve(app.getAppPath(), './modules/EdgeLib.dll'));
 
 // dotNetFunction("Test", function(err: any, result: any) {
@@ -30,31 +46,25 @@ ipcMain.on("rtsp/stop", async (event, args) => {
 
 ipcMain.handle("discovery", async (event, args) => {
   discovery();
-  event.sender.send("discovery", "test");
   return false;
 });
 
 ipcMain.handle("exit", async (event, args) => {
-  app.exit();
+  WindowManager.exit(args.path);
   return false;
 });
 
 ipcMain.handle("maximize", async (event, args) => {
-  if (mainWindow.isMaximized()) {
-    mainWindow.restore();
-  } else {
-    mainWindow.maximize();
-  }
-  return mainWindow.isMaximized();
+  return WindowManager.maximize(args.path);
 });
 
 ipcMain.handle("minimize", async (event, args) => {
-  mainWindow.minimize();
+  WindowManager.minimize(args.path);
   return true;
 });
 
 ipcMain.handle("createWindow", async (event, args) => {
-  createWindow(args.path, {
+  WindowManager.create(args.path, {
     webPreferences: {
       blinkFeatures: "CSSStickyPosition",
       nodeIntegration: true,
@@ -66,8 +76,6 @@ ipcMain.handle("createWindow", async (event, args) => {
     } as any,
     minWidth: 640,
     minHeight: 480,
-    maxWidth: 1080,
-    maxHeight: 720,
     width: 720,
     height: 640,
     kiosk: false,
@@ -94,34 +102,30 @@ ipcMain.handle("createWindow", async (event, args) => {
 
 export let mainWindow: BrowserWindow;
 
-const createWindow = (
-  path: string,
-  options: Electron.BrowserWindowConstructorOptions
-) => {
-  var _window = new BrowserWindow(options);
+// const createWindow = (
+//   path: string,
+//   options: Electron.BrowserWindowConstructorOptions
+// ) => {
+//   var _window = new BrowserWindow(options);
 
-  _window.loadURL("file://" + __dirname + "/index.html#" + path);
-  _window.webContents.openDevTools();
+//   _window.loadURL("file://" + __dirname + "/index.html#" + path);
+//   _window.webContents.openDevTools();
 
-  _window.once("ready-to-show", () => {
-    _window.show();
-    console.log("show!!!");
-    setTimeout(() => {
-      mainWindow.webContents.send("test", "test");
-    }, 1000);
-  });
-  _window.on("closed", function () {
-    _window = null;
-  });
-  return _window;
-};
+//   _window.once("ready-to-show", () => {
+//     _window.show();
+//   });
+//   _window.on("closed", function () {
+//     _window = null;
+//   });
+//   return _window;
+// };
 
 app.on("window-all-closed", function () {
   if (process.platform != "darwin") app.quit();
 });
 
 app.on("ready", () => {
-  mainWindow = createWindow("/", {
+  WindowManager.create("/", {
     webPreferences: {
       blinkFeatures: "CSSStickyPosition",
       nodeIntegration: true,

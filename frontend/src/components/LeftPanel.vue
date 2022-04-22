@@ -179,8 +179,6 @@ export default Vue.extend({
           children: [] as any,
         },
       ] as any;
-      console.log(data);
-      console.log(this.$refs.tree);
     },
     handleRecord(item: any) {
       item.record = !item.record;

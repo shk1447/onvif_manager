@@ -24,17 +24,6 @@ export default Vue.extend({
     'left-panel': LeftPanel,
     'content-layout': ContentLayout,
   },
-  data: () => {
-    return {
-      id: 'test',
-    };
-  },
-  created(): void {
-    console.log('test');
-  },
-  mounted(): void {
-    console.log('test');
-  },
 });
 </script>
 
@@ -46,6 +35,7 @@ export default Vue.extend({
   grid-template-rows: repeat(auto-fill, minmax(1%, auto));
 }
 .grid-header {
+  min-height: 45px;
   z-index: 999999999;
   grid-column: 1/ 101;
   grid-row: 1/6;
