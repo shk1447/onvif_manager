@@ -1,7 +1,16 @@
 <template>
   <div class="header-area">
-    <div style="width: 48px; margin-left: 8px">
-      <div class="logo" />
+    <div
+      :style="
+        title
+          ? 'width: auto; margin-left: 8px; display:flex; align-items:center;'
+          : 'width: 48px; margin-left: 8px'
+      "
+    >
+      <div v-if="title" style="color: rgb(222, 222, 222); font-weight: 700">
+        {{ title }}
+      </div>
+      <div v-else class="logo" />
     </div>
     <div v-if="isMenu" style="background: rgb(60, 60, 60)">
       <my-theme style="height: 100%">
@@ -16,8 +25,14 @@
             <hsc-menu-item label="Exit" @click="() => {}" />
           </hsc-menu-bar-item>
           <hsc-menu-bar-item label="Manager" class="menu-item-wrapper">
-            <hsc-menu-item label="Inference App" @click="createWindow" />
-            <hsc-menu-item label="NVR" @click="createWindow" />
+            <hsc-menu-item
+              label="Inference App"
+              @click="createWindow('/inference_manager')"
+            />
+            <hsc-menu-item
+              label="Anomaly Video"
+              @click="createWindow('/anomaly_manager')"
+            />
           </hsc-menu-bar-item>
           <hsc-menu-bar-item label="View" class="menu-item-wrapper">
             <hsc-menu-item label="Resources">
@@ -93,6 +108,7 @@ const separator = {
 
 interface IMenuProps {
   isMenu: boolean;
+  title: string;
 }
 interface IMenuState {
   maximize: boolean;
@@ -106,6 +122,12 @@ export default Vue.extend<IMenuState, any, any, IMenuProps>({
       type: Boolean,
       default() {
         return true;
+      },
+    },
+    title: {
+      type: String,
+      default() {
+        return '';
       },
     },
   },
@@ -137,8 +159,8 @@ export default Vue.extend<IMenuState, any, any, IMenuProps>({
     };
   },
   methods: {
-    createWindow() {
-      this.$electron.createWindow('/train');
+    createWindow(path: string) {
+      this.$electron.createWindow(path);
     },
     handleMinimize() {
       this.$electron.minimize(this.$router.currentRoute.path);

@@ -164,14 +164,15 @@ export default Vue.extend({
       EventBus.$emit('addContent', item);
     },
     updateResource(event: any, data: any) {
+      var rtspVideos = data.map((item: any) => {
+        item.record = false;
+        return item;
+      }) as any;
       this.children = [
         {
           id: 'root01',
-          name: 'Rtsp Video',
-          children: data.map((item: any) => {
-            item.record = false;
-            return item;
-          }) as any,
+          name: 'Rtsp Video (' + rtspVideos.length + ')',
+          children: rtspVideos,
         },
         {
           id: 'root02',

@@ -29,7 +29,6 @@ export class RtspService {
 
       try {
         var cmd = ffmpeg(input_uri)
-          .inputOption("-rtsp_transport", "tcp", "-buffer_size", "102400")
           .outputFormat("flv")
           .outputFps(25)
           .videoCodec("copy")

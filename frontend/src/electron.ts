@@ -3,7 +3,6 @@ import electron from 'electron';
 import { IElectronAPI } from './shims-tsx';
 class ElectronAPI implements IElectronAPI {
   discovery() {
-    console.log('aaa');
     electron.ipcRenderer.invoke('discovery', {}).then(result => {
       console.log(result);
     });

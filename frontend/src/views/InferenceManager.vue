@@ -1,13 +1,20 @@
 <template>
   <div class="grid-container">
     <div class="grid-header">
-      <menu-bar :isMenu="true" />
+      <menu-bar :isMenu="false" title="Inference App Manager" />
     </div>
-    <div class="grid-panel">
-      <left-panel />
-    </div>
-    <div class="grid-content">
-      <content-layout />
+    <div class="grid-body">
+      <div
+        style="
+          height: 100%;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <inference-process />
+      </div>
     </div>
   </div>
 </template>
@@ -15,14 +22,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import MenuBar from '../components/MenuBar.vue';
-import LeftPanel from '../components/LeftPanel.vue';
-import ContentLayout from '../components/ContentLayout.vue';
+import InferenceProcess from '../components/contents/InferenceProcess.vue';
 
 export default Vue.extend({
   components: {
     'menu-bar': MenuBar,
-    'left-panel': LeftPanel,
-    'content-layout': ContentLayout,
+    'inference-process': InferenceProcess,
   },
 });
 </script>
@@ -37,19 +42,11 @@ export default Vue.extend({
 .grid-header {
   z-index: 999999999;
   grid-column: 1/ 101;
-  grid-row: 1/6;
+  grid-row: 1/5;
 }
 
-.grid-panel {
-  margin-top: 4px;
-  margin-left: 4px;
-  grid-column: 1/ 21;
-  grid-row: 6/101;
-}
-
-.grid-content {
-  margin: 4px;
-  grid-column: 21/ 101;
-  grid-row: 6/101;
+.grid-body {
+  grid-column: 1/ 101;
+  grid-row: 5/101;
 }
 </style>

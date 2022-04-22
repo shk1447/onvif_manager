@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import VueRouter, { RouteConfig } from 'vue-router';
 import ClientView from '../views/ClientView.vue';
-import TrainView from '../views/TrainView.vue';
+import InferenceManager from '../views/InferenceManager.vue';
+import AnomalyManager from '../views/AnomalyManager.vue';
 
 Vue.use(VueRouter);
 
@@ -12,9 +13,14 @@ const routes: Array<RouteConfig> = [
     component: ClientView,
   },
   {
-    path: '/train',
-    name: 'Train',
-    component: TrainView,
+    path: '/inference_manager',
+    name: 'InferenceManager',
+    component: InferenceManager,
+  },
+  {
+    path: '/anomaly_manager',
+    name: 'AnomalyManager',
+    component: AnomalyManager,
   },
 ];
 

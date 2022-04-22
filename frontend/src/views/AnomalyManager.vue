@@ -1,7 +1,7 @@
 <template>
   <div class="grid-container">
     <div class="grid-header">
-      <menu-bar :isMenu="false" />
+      <menu-bar :isMenu="false" title="Anomaly Video Manager" />
     </div>
     <div class="grid-body">
       <div
@@ -13,7 +13,7 @@
           align-items: center;
         "
       >
-        Inference App Manager!!!!!!
+        <anomaly-video />
       </div>
     </div>
   </div>
@@ -22,15 +22,17 @@
 <script lang="ts">
 import Vue from 'vue';
 import MenuBar from '../components/MenuBar.vue';
+import AnomalyVideo from '../components/contents/AnomalyVideo.vue';
 
 export default Vue.extend({
   components: {
     'menu-bar': MenuBar,
+    'anomaly-video': AnomalyVideo,
   },
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .grid-container {
   height: 100%;
   display: grid;
@@ -38,14 +40,12 @@ export default Vue.extend({
   grid-template-rows: repeat(auto-fill, minmax(1%, auto));
 }
 .grid-header {
-  min-height: 45px;
   z-index: 999999999;
   grid-column: 1/ 101;
   grid-row: 1/5;
 }
 
 .grid-body {
-  margin: 4px;
   grid-column: 1/ 101;
   grid-row: 5/101;
 }
