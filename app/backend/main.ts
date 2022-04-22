@@ -1,8 +1,7 @@
 import { app, BrowserWindow, ipcMain } from "electron";
-
+import { resolve } from "path";
 // var dotNetFunction = edge.func(path.resolve(app.getAppPath(), './modules/EdgeLib.dll'));
-console.log("aaaaa");
-// console.log('aaa');
+
 // dotNetFunction("Test", function(err: any, result: any) {
 //   if(err) {
 //     console.log(err);
@@ -31,7 +30,6 @@ ipcMain.on("rtsp/stop", async (event, args) => {
 
 ipcMain.handle("discovery", async (event, args) => {
   discovery();
-  console.log(event.sender);
   event.sender.send("discovery", "test");
   return false;
 });
@@ -66,10 +64,12 @@ ipcMain.handle("createWindow", async (event, args) => {
       sandbox: false,
       enableRemoteModule: true,
     } as any,
-    minWidth: 1600,
-    minHeight: 900,
-    width: 1600,
-    height: 900,
+    minWidth: 640,
+    minHeight: 480,
+    maxWidth: 1080,
+    maxHeight: 720,
+    width: 720,
+    height: 640,
     kiosk: false,
     fullscreen: false,
     fullscreenable: true,
@@ -141,5 +141,6 @@ app.on("ready", () => {
     resizable: true,
     frame: false,
     show: false,
+    icon: resolve("../favicon.ico"),
   });
 });

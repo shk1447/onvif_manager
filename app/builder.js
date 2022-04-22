@@ -124,6 +124,7 @@ if (watch) {
     var error = parseInt(builder.stdout.toString("utf-8"));
     if (error > 0) {
       console.log("error가 있습니다.");
+      if (child) await killProcess(child);
       process.exit();
     } else {
       if (child) await killProcess(child);

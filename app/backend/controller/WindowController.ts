@@ -1,6 +1,6 @@
 export class WindowController {
   constructor() {
-    console.log("test");
+    // console.log("test");
   }
 
   create() {}

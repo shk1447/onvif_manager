@@ -1,8 +1,18 @@
 <template>
   <div class="grid-container">
-    <div class="grid-header"></div>
+    <div class="grid-header">
+      <menu-bar :isMenu="false" />
+    </div>
     <div class="grid-body">
-      <div style="display: flex; justify-content: center; align-items: center">
+      <div
+        style="
+          height: 100%;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        "
+      >
         Inference App Manager!!!!!!
       </div>
     </div>
@@ -11,9 +21,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import MenuBar from '../components/MenuBar.vue';
 
 export default Vue.extend({
-  components: {},
+  components: {
+    'menu-bar': MenuBar,
+  },
   data: () => {
     return {
       id: 'test',
@@ -36,11 +49,13 @@ export default Vue.extend({
   grid-template-rows: repeat(auto-fill, minmax(1%, auto));
 }
 .grid-header {
+  z-index: 999999999;
   grid-column: 1/ 101;
   grid-row: 1/5;
 }
 
 .grid-body {
+  margin: 4px;
   grid-column: 1/ 101;
   grid-row: 5/101;
 }

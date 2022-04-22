@@ -9,7 +9,7 @@ export class ThreadController {
     `);
 
     helloWorld("test", function (err: any, result: any) {
-      console.log("aaa" + result);
+      // console.log("aaa" + result);
     });
   }
 

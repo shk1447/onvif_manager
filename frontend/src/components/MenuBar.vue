@@ -1,5 +1,8 @@
 <template>
   <div class="header-area">
+    <div style="width: 48px; margin-left: 8px">
+      <div class="logo" />
+    </div>
     <div v-if="isMenu" style="background: rgb(60, 60, 60)">
       <my-theme style="height: 100%">
         <hsc-menu-bar style="height: 100%; border-radius: 0 0 4pt 0">
@@ -88,7 +91,15 @@ const separator = {
   margin: '0pt',
 };
 
-export default Vue.extend({
+interface IMenuProps {
+  isMenu: boolean;
+}
+interface IMenuState {
+  maximize: boolean;
+  selectedViews: string[];
+}
+
+export default Vue.extend<IMenuState, any, any, IMenuProps>({
   name: 'menu-bar',
   props: {
     isMenu: {
@@ -153,7 +164,7 @@ export default Vue.extend({
 }
 .menu-item-wrapper {
   vertical-align: middle;
-  padding: 0em 1em 0em 1em !important;
+
   cursor: pointer;
 }
 .action-item-wrapper {
@@ -188,5 +199,12 @@ export default Vue.extend({
   height: 36px !important;
   align-items: center !important;
   justify-content: flex-start;
+}
+.logo {
+  height: 100%;
+  margin: 8px;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background: url('../assets/icn_SaigeVAD.ico');
 }
 </style>

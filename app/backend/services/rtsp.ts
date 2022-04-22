@@ -1,12 +1,11 @@
-import ffmpeg from "fluent-ffmpeg";
-import { mainWindow } from "../main";
 import app from "../app";
-export const stream_cams: any = {};
+import ffmpeg from "fluent-ffmpeg";
 import webSocketStream from "websocket-stream/stream";
-
-export const start = (cam: any) => {
-  app.ws(`/rtsp/${cam.name}`, (ws, req) => {
-    //
+import { cams } from "../methods/onvif";
+app.ws(`/rtsp/:name`, (ws, req) => {
+  const name = req.params.name;
+  const cam = cams.find((cam) => cam.name === name);
+  if (cam) {
     const stream = webSocketStream(
       ws,
       {
@@ -29,13 +28,5 @@ export const start = (cam: any) => {
       .videoCodec("copy")
       .noAudio();
     cmd.pipe(stream);
-  });
-};
-
-export const stop = (cam: any) => {
-  if (stream_cams[cam.name]) {
-    console.log("test");
-    stream_cams[cam.name].kill("SIGINT");
-    // delete stream_cams[cam.name];
   }
-};
+});
