@@ -23,7 +23,7 @@ class _WindowManager implements IWindowManager {
     var _window = new BrowserWindow(options);
 
     _window.loadURL("file://" + __dirname + "/index.html#" + path);
-    _window.webContents.openDevTools();
+    // _window.webContents.openDevTools();
 
     _window.once("ready-to-show", () => {
       _window.show();
