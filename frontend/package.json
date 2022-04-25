@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "serve": "vue-cli-service serve --mode browser",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "watch": "set NODE_ENV=production && vue-cli-service build --watch --mode development"
+    "watch": "set NODE_ENV=production && vue-cli-service build --watch --mode electron"
   },
   "dependencies": {
     "@hscmap/vue-menu": "^2.10.1",
@@ -14,6 +14,7 @@
     "electron": "^18.0.1",
     "flv.js": "^1.6.2",
     "golden-layout": "^2.5.0",
+    "is-electron": "^2.2.1",
     "mux.js": "^6.0.1",
     "video.js": "^7.18.1",
     "vue": "^2.6.14",
@@ -49,6 +50,7 @@
     "sass-loader": "^12.0.0",
     "typescript": "~4.5.5",
     "vue-template-compiler": "^2.6.14",
+    "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2"
   }
 }

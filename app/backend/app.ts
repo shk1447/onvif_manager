@@ -7,8 +7,17 @@ let app = express();
 // extend express app with app.ws()
 let ws = expressWebSocket(app, null, {
   // ws options here
-  perMessageDeflate: true,
-} as any);
+  wsOptions: {
+    perMessageDeflate: false,
+  },
+});
+
+const wss = ws.getWss();
+wss.on("connection", (ws, req) => {
+  ws.on("message", (message) => {
+    console.log(message);
+  });
+});
 
 new RtspService(ws.app);
 

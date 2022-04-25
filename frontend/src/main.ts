@@ -24,8 +24,15 @@ import * as VueMenu from '@hscmap/vue-menu';
 Vue.use(VueMenu);
 
 // 웹 빌드에 대한 분기 필요
-import ElectronAPI from './electron';
-Vue.prototype.$electron = ElectronAPI;
+
+import isElectron from 'is-electron';
+if (isElectron()) {
+  const ElectronAPI = require('./electron');
+  Vue.prototype.$electron = ElectronAPI.default;
+} else {
+  Vue.prototype.$electron = null;
+}
+console.log(process.env.MODE);
 
 new Vue({
   router,

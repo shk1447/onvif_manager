@@ -36,6 +36,16 @@ export default Vue.extend<any, any, any, IContentLayout>({
   },
   mounted() {
     var gl: GoldenLayout = new GoldenLayout(this.$refs.layout as HTMLElement);
+
+    gl.on('itemCreated', (item: any) => {
+      if (item.target.isStack) {
+        const _element = document.createElement('i');
+        _element.className = 'v-icon mdi mdi-cog';
+        _element.style.fontSize = '14px';
+        item.target.header.controlsContainerElement.prepend(_element);
+      }
+    });
+
     gl.registerComponentFactoryFunction(
       'example',
       (
@@ -53,6 +63,9 @@ export default Vue.extend<any, any, any, IContentLayout>({
       root: {
         type: 'stack',
         content: [] as ComponentItemConfig[],
+      },
+      header: {
+        popout: false,
       },
     } as LayoutConfig);
 

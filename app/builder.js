@@ -128,6 +128,7 @@ if (watch) {
       process.exit();
     } else {
       if (child) await killProcess(child);
+
       var command = "electron.cmd";
       var args = ["main.js"];
       var options = { cwd: "../dist" };

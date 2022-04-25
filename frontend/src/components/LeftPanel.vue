@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%; width: 100%; overflow: auto; background: #222222">
+  <div style="height: 100%; width: 100%; background: #222222">
     <div class="expand-title" style="border-top: 1px solid rgb(51, 51, 51)">
       <div style="font-size: 0.7rem">
         {{ name }}
@@ -135,9 +135,11 @@
 <script lang="ts">
 import Vue from 'vue';
 import EventBus from '../EventBus';
-export default Vue.extend({
+import { WebSocketClient } from '../api/WebSocket';
+export default Vue.extend<any, any, any, any>({
   data() {
     return {
+      client: undefined,
       expand: true,
       name: 'Resources',
       items: [
@@ -155,7 +157,8 @@ export default Vue.extend({
   },
   methods: {
     handleDiscovery() {
-      this.$electron.discovery();
+      if (this.$electron) this.$electron.discovery();
+      else if (this.client) this.client.ws.send('update');
     },
     async createContent(item: any) {
       console.log(item);
@@ -184,9 +187,24 @@ export default Vue.extend({
     handleRecord(item: any) {
       item.record = !item.record;
     },
+    handleSocketState(state: boolean, client: WebSocketClient) {
+      if (state) {
+        this.client = client;
+        client.on('data', (cams: any) => {
+          this.updateResource('', cams);
+        });
+        client.ws.send('update');
+      }
+    },
   },
   created() {
-    this.$electron.on('discovery', this.updateResource);
+    if (this.$electron) this.$electron.on('discovery', this.updateResource);
+    else {
+      new WebSocketClient(
+        'ws://localhost:9090/discovery',
+        this.handleSocketState,
+      );
+    }
   },
   mounted() {
     this.handleDiscovery();
@@ -220,6 +238,8 @@ export default Vue.extend({
 }
 
 .expand-content {
+  height: calc(100% - 3em) !important;
+  overflow: auto;
   width: 100%;
   transition: 0.3s ease all;
   min-height: 0px;
@@ -227,7 +247,6 @@ export default Vue.extend({
   visibility: hidden;
 }
 .expand-content.expand {
-  height: auto;
   min-height: 250px;
   visibility: visible;
 }

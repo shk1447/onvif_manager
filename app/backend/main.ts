@@ -4,7 +4,7 @@ import unhandled from "electron-unhandled";
 
 unhandled({
   logger: (err: Error) => {
-    if (err) console.log("occured unhandled error!");
+    if (err) console.log("occured unhandled error!", err);
   },
   showDialog: false,
   reportButton: (error) => {
@@ -22,7 +22,11 @@ console.log(WindowController);
 import ThreadController from "./controller/ThreadController";
 console.log(ThreadController);
 
-import { discovery } from "./methods/onvif";
+import { Onvif } from "./methods/onvif";
+export const OnvifInstance = new Onvif("admin", "admin1357");
+OnvifInstance.on("discovery", (cams: any[]) => {
+  WindowManager.windows["/"].webContents.send("discovery", cams);
+});
 import { start, stop } from "./methods/ffmpeg";
 
 process.env.app_path = app.getAppPath();
@@ -36,7 +40,8 @@ ipcMain.on("rtsp/stop", async (event, args) => {
 });
 
 ipcMain.handle("discovery", async (event, args) => {
-  discovery();
+  OnvifInstance.custom_discovery();
+
   return false;
 });
 

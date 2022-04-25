@@ -45,6 +45,7 @@ export default Vue.extend<IRtspVideo, any, any, any>({
   },
   methods: {
     destroyPlayer() {
+      console.log(this.player);
       this.player.destroy();
     },
   },

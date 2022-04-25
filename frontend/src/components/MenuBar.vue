@@ -76,16 +76,18 @@
     </div>
     <v-spacer style="-webkit-app-region: drag; height: 100%" />
 
-    <div class="action-item-wrapper" @click="handleMinimize">
-      <v-icon small>mdi-window-minimize</v-icon>
-    </div>
-    <div class="action-item-wrapper" @click="handleMaximize">
-      <v-icon small>{{
-        !maximize ? 'mdi-window-maximize' : 'mdi-window-restore'
-      }}</v-icon>
-    </div>
-    <div class="action-item-wrapper" @click="handleExit">
-      <v-icon small>mdi-window-close</v-icon>
+    <div v-if="$electron" style="display: flex">
+      <div class="action-item-wrapper" @click="handleMinimize">
+        <v-icon small>mdi-window-minimize</v-icon>
+      </div>
+      <div class="action-item-wrapper" @click="handleMaximize">
+        <v-icon small>{{
+          !maximize ? 'mdi-window-maximize' : 'mdi-window-restore'
+        }}</v-icon>
+      </div>
+      <div class="action-item-wrapper" @click="handleExit">
+        <v-icon small>mdi-window-close</v-icon>
+      </div>
     </div>
   </div>
 </template>
@@ -160,7 +162,16 @@ export default Vue.extend<IMenuState, any, any, IMenuProps>({
   },
   methods: {
     createWindow(path: string) {
-      this.$electron.createWindow(path);
+      if (this.$electron) this.$electron.createWindow(path);
+      else {
+        // build 환경에 따른 interface 맞추는 작업 필요
+        window.open(
+          '#' + path,
+          '',
+          'top=0, left=0, width=1080, height=720, status=no, menubar=no, toolbar=no, resizable=no',
+        );
+        console.log(this.$router);
+      }
     },
     handleMinimize() {
       this.$electron.minimize(this.$router.currentRoute.path);
