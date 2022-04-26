@@ -31,7 +31,7 @@ export default Vue.extend<IRtspVideo, any, any, any>({
         this.player = flvjs.createPlayer({
           type: 'flv',
           isLive: true,
-          url: `ws://localhost:9090/rtsp/${this.name}`,
+          url: `ws://localhost:${this.$router.currentRoute.query.port}/rtsp/stream/${this.name}`,
         });
         this.player.attachMediaElement(video);
         try {

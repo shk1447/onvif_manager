@@ -12,38 +12,9 @@ unhandled({
   },
 });
 
-import "./app";
-
+import service from "./app";
 import { WindowManager } from "./methods/electron";
-
-import WindowController from "./controller/WindowController";
-console.log(WindowController);
-
-import ThreadController from "./controller/ThreadController";
-console.log(ThreadController);
-
-import { Onvif } from "./methods/onvif";
-export const OnvifInstance = new Onvif("admin", "admin1357");
-OnvifInstance.on("discovery", (cams: any[]) => {
-  WindowManager.windows["/"].webContents.send("discovery", cams);
-});
-import { start, stop } from "./methods/ffmpeg";
-
 process.env.app_path = app.getAppPath();
-
-ipcMain.on("rtsp/start", async (event, args) => {
-  start(args);
-});
-
-ipcMain.on("rtsp/stop", async (event, args) => {
-  stop(args);
-});
-
-ipcMain.handle("discovery", async (event, args) => {
-  OnvifInstance.custom_discovery();
-
-  return false;
-});
 
 ipcMain.handle("exit", async (event, args) => {
   WindowManager.exit(args.path);
@@ -60,27 +31,31 @@ ipcMain.handle("minimize", async (event, args) => {
 });
 
 ipcMain.handle("createWindow", async (event, args) => {
-  WindowManager.create(args.path, {
-    webPreferences: {
-      blinkFeatures: "CSSStickyPosition",
-      nodeIntegration: true,
-      nodeIntegrationInWorker: false,
-      contextIsolation: false,
-      webSecurity: false,
-      sandbox: false,
-      enableRemoteModule: true,
-    } as any,
-    minWidth: 640,
-    minHeight: 480,
-    width: 720,
-    height: 640,
-    kiosk: false,
-    fullscreen: false,
-    fullscreenable: true,
-    resizable: true,
-    frame: false,
-    show: false,
-  });
+  WindowManager.create(
+    args.path,
+    {
+      webPreferences: {
+        blinkFeatures: "CSSStickyPosition",
+        nodeIntegration: true,
+        nodeIntegrationInWorker: false,
+        contextIsolation: false,
+        webSecurity: false,
+        sandbox: false,
+        enableRemoteModule: true,
+      } as any,
+      minWidth: 640,
+      minHeight: 480,
+      width: 720,
+      height: 640,
+      kiosk: false,
+      fullscreen: false,
+      fullscreenable: true,
+      resizable: true,
+      frame: false,
+      show: false,
+    },
+    parseInt(process.env.port)
+  );
   return true;
 });
 
@@ -89,26 +64,33 @@ app.on("window-all-closed", function () {
 });
 
 app.on("ready", () => {
-  WindowManager.create("/", {
-    webPreferences: {
-      blinkFeatures: "CSSStickyPosition",
-      nodeIntegration: true,
-      nodeIntegrationInWorker: false,
-      contextIsolation: false,
-      webSecurity: false,
-      sandbox: false,
-      enableRemoteModule: true,
-    } as any,
-    minWidth: 1600,
-    minHeight: 900,
-    width: 1600,
-    height: 900,
-    kiosk: false,
-    fullscreen: false,
-    fullscreenable: true,
-    resizable: true,
-    frame: false,
-    show: false,
-    icon: resolve("../favicon.ico"),
+  service.then((port: number) => {
+    process.env.port = port.toString();
+    WindowManager.create(
+      "/",
+      {
+        webPreferences: {
+          blinkFeatures: "CSSStickyPosition",
+          nodeIntegration: true,
+          nodeIntegrationInWorker: false,
+          contextIsolation: false,
+          webSecurity: false,
+          sandbox: false,
+          enableRemoteModule: true,
+        } as any,
+        minWidth: 1600,
+        minHeight: 900,
+        width: 1600,
+        height: 900,
+        kiosk: false,
+        fullscreen: false,
+        fullscreenable: true,
+        resizable: true,
+        frame: false,
+        show: false,
+        icon: resolve("../favicon.ico"),
+      },
+      port
+    );
   });
 });

@@ -1,13 +1,16 @@
 import ffmpeg from "fluent-ffmpeg";
 import webSocketStream from "websocket-stream/stream";
 import { Application } from "express-ws";
-import { OnvifInstance } from "../main";
 import ws from "ws";
+
+// 향후 Onvif 생성자도 api로 변경 필요.
+import { Onvif } from "../methods/onvif";
+const OnvifInstance = new Onvif("admin", "admin1357");
 
 export class RtspService {
   constructor(app: Application) {
-    app.ws(`/rtsp/:name`, this.stream);
-    app.ws(`/discovery`, this.discovery);
+    app.ws(`/rtsp/stream/:name`, this.stream);
+    app.ws(`/rtsp/discovery`, this.discovery);
   }
 
   discovery = (ws: ws, req: any) => {

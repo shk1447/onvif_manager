@@ -1,8 +1,12 @@
 import express from "express";
 import expressWebSocket from "express-ws";
-import { RtspService } from "./services/rtsp";
+import { RtspService } from "./services/RtspService";
+import { WatcherService } from "./services/WatcherService";
+import portscanner from "portscanner";
 
 let app = express();
+
+app.use(express.json());
 
 // extend express app with app.ws()
 let ws = expressWebSocket(app, null, {
@@ -20,5 +24,13 @@ wss.on("connection", (ws, req) => {
 });
 
 new RtspService(ws.app);
+new WatcherService(ws.app);
 
-app.listen(9090);
+export default new Promise((resolve, reject) => {
+  portscanner.findAPortNotInUse(9090, (err, port) => {
+    app.listen(port, "0.0.0.0", () => {
+      console.log("listen port : ", port);
+      resolve(port);
+    });
+  });
+});

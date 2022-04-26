@@ -28,4 +28,8 @@ export class WebSocketClient extends EventHandler {
       console.log(error);
     }
   };
+
+  close = () => {
+    this.ws.close();
+  };
 }

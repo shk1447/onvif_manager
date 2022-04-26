@@ -14,6 +14,8 @@ namespace TcpServer
             server.Events.ClientDisconnected += ClientDisconnected;
             server.Events.MessageReceived += MessageReceived;
             server.Callbacks.SyncRequestReceived = SyncRequestReceived;
+            server.Events.StreamReceived += Events_StreamReceived;
+            server.Events.ExceptionEncountered += Events_ExceptionEncountered;
             server.Start();
 
             // list clients
@@ -39,6 +41,16 @@ namespace TcpServer
             Console.ReadLine();
         }
 
+        private static void Events_ExceptionEncountered(object sender, ExceptionEventArgs e)
+        {
+            Console.WriteLine(e.Exception.ToString());
+        }
+
+        private static void Events_StreamReceived(object sender, StreamReceivedEventArgs e)
+        {
+            Console.WriteLine(e.Metadata);
+        }
+
         static void ClientConnected(object sender, ConnectionEventArgs args)
         {
             Console.WriteLine("Client connected: " + args.IpPort);
@@ -50,9 +62,9 @@ namespace TcpServer
             md.Add("foo", "bar");
             server.Send(args.IpPort, "Hello, client!  Here's some metadata!", md);
 
-            // send Sync
-            SyncResponse resp = server.SendAndWait(5000, args.IpPort, "Hey, say hello back within 5 seconds!");
-            Console.WriteLine(resp.Data);
+            //// send Sync
+            //SyncResponse resp = server.SendAndWait(5000, args.IpPort, "Hey, say hello back within 5 seconds!");
+            //Console.WriteLine(resp.Data);
         }
 
         static void ClientDisconnected(object sender, DisconnectionEventArgs args)
@@ -67,6 +79,7 @@ namespace TcpServer
 
         static SyncResponse SyncRequestReceived(SyncRequest req)
         {
+            Console.WriteLine(req.Metadata);
             return new SyncResponse(req, "Hello back at you!");
         }
     }

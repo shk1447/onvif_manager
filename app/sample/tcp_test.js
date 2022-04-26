@@ -1,4 +1,3 @@
-var tcp = require('./tcp')
+var tcp = require("./tcp");
 
-var test = new tcp(9000);
-
+var test = new tcp(5001);

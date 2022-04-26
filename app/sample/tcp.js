@@ -1,70 +1,80 @@
+var net = require("net");
+var guid = require("guid");
+console.log(guid);
+var watson = function (message, data) {};
 
-var net = require('net');
+module.exports = function (port, cluster) {
+  var clients = [];
+  var cluster_node = [];
+  function connect_client(cluster) {
+    console.log("test");
+    var cluster = cluster;
+    var client = net.connect(
+      { port: cluster.port, host: cluster.host },
+      function () {
+        console.log(cluster.host + ":" + cluster.port + " 접속 성공!");
+        cluster_node.push(cluster.host + ":" + cluster.port);
+        console.log(cluster_node);
+        var data = "Hello, client!  Here's some metadata!22222";
+        var _guid = guid.raw();
+        var buf = Buffer.from(
+          `{"s":"Normal","guid":"${_guid}","sreq":true,"exp":"2022-04-26T15:43:46.15343+09:00","len":${data.length},"md":{"Request":"Initialization"}}\r\n\r\n${data}`,
+          "utf-8"
+        );
+        console.log(buf);
+        client.write(buf);
+      }
+    );
 
-var watson = function(message, data) {
-
-}
-
-module.exports = function(port,cluster) {
-    var clients = [];
-    var cluster_node = [];
-    function connect_client(cluster) {
-      console.log('test')
-        var cluster = cluster;
-        var client = net.connect({port:cluster.port, host:cluster.host}, function() {
-            console.log(cluster.host + ':' + cluster.port + ' 접속 성공!')
-            cluster_node.push(cluster.host + ":" + cluster.port);
-            console.log(cluster_node);
-        })
-        
-
-        client.on('data', function(data) {
-          var message = "";
-          var watson = {};
-          var str = Buffer.from(data).toString('utf8', 0, data.length);
-          console.log(str.length)
-          var resp = str.split(`\r\n\r\n`);
-          try {
-            switch(resp.length) {
-              case 2: {
-                watson = JSON.parse(resp[0]);
-                message = resp[1];
-                break;
-              }
-              case 1: {
-                message = resp[0];
-                break;
-              }
-            }
-            console.log(watson);
-            console.log(message);
-          } catch (error) {
-            console.log(error);
-            console.log(str);
+    client.on("data", function (data) {
+      var message = "";
+      var watson = {};
+      var str = Buffer.from(data).toString("utf8", 0, data.length);
+      console.log(str);
+      var resp = str.split(`\r\n\r\n`);
+      try {
+        switch (resp.length) {
+          case 2: {
+            watson = JSON.parse(resp[0]);
+            message = resp[1];
+            break;
           }
-          
-          // var buf = Buffer.from(`{"s":"Normal","len":37,"md":{"foo":"bar"}}\r\n\r\nHello, client!  Here's some metadata!`, 'utf-8');
-          // console.log(buf)
-          client.write(data)
-        })
-        client.on('end', function(data) {
-            console.log(data)
-        })
-        client.on('error', function(error) {
-            console.log('error : ' + error);
-        })
-        client.on('close', function(data) {
-            console.log('server disconnected');
-            var destroy_index = cluster_node.findIndex((node) => { return node === cluster.host + ":" + cluster.port})
-            if(destroy_index >= 0) {
-                cluster_node.splice(destroy_index, 1);
-            }
-        })
-    }
+          case 1: {
+            message = resp[0];
+            break;
+          }
+        }
+        console.log(watson);
+        console.log(message);
+      } catch (error) {
+        console.log(error);
+        console.log(str);
+      }
 
-    connect_client({port:9000,host:'localhost'});
+      // var buf = Buffer.from(`{"s":"Normal","len":37,"md":{"foo":"bar"}}\r\n\r\nHello, client!  Here's some metadata!`, 'utf-8');
+      // console.log(buf)
+      // client.write(data);
+    });
+    client.on("end", function (data) {
+      console.log(data);
+    });
+    client.on("error", function (error) {
+      console.log("error : " + error);
+    });
+    client.on("close", function (data) {
+      console.log("server disconnected");
+      var destroy_index = cluster_node.findIndex((node) => {
+        return node === cluster.host + ":" + cluster.port;
+      });
+      if (destroy_index >= 0) {
+        cluster_node.splice(destroy_index, 1);
+      }
+    });
+  }
 
-    /*
+  connect_client({ port: 5001, host: "127.0.0.1" });
+
+  /*
     var server = net.createServer()
 
     server.on('error', function(err) {
@@ -139,6 +149,5 @@ module.exports = function(port,cluster) {
         }
     })
     */
-    // 서버 접근
-    
-}
+  // 서버 접근
+};

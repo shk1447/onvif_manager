@@ -11,7 +11,7 @@ interface IWindowManager {
 declare class _WindowManager implements IWindowManager {
     windows: any;
     constructor();
-    create: (path: string, options: Electron.BrowserWindowConstructorOptions) => any;
+    create: (path: string, options: Electron.BrowserWindowConstructorOptions, port?: number) => any;
     minimize: (path: string) => boolean;
     maximize: (path: string) => any;
     exit: (path: string) => boolean;

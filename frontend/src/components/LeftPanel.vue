@@ -157,8 +157,7 @@ export default Vue.extend<any, any, any, any>({
   },
   methods: {
     handleDiscovery() {
-      if (this.$electron) this.$electron.discovery();
-      else if (this.client) this.client.ws.send('update');
+      this.client.ws.send('update');
     },
     async createContent(item: any) {
       console.log(item);
@@ -166,7 +165,7 @@ export default Vue.extend<any, any, any, any>({
     async onLoadContent(item: any) {
       EventBus.$emit('addContent', item);
     },
-    updateResource(event: any, data: any) {
+    updateResource(data: any) {
       var rtspVideos = data.map((item: any) => {
         item.record = false;
         return item;
@@ -191,23 +190,24 @@ export default Vue.extend<any, any, any, any>({
       if (state) {
         this.client = client;
         client.on('data', (cams: any) => {
-          this.updateResource('', cams);
+          this.updateResource(cams);
         });
         client.ws.send('update');
       }
     },
   },
   created() {
-    if (this.$electron) this.$electron.on('discovery', this.updateResource);
-    else {
-      new WebSocketClient(
-        'ws://localhost:9090/discovery',
-        this.handleSocketState,
-      );
-    }
+    console.log();
+    new WebSocketClient(
+      `ws://localhost:${this.$router.currentRoute.query.port}/rtsp/discovery`,
+      this.handleSocketState,
+    );
   },
   mounted() {
-    this.handleDiscovery();
+    // this.handleDiscovery();
+  },
+  beforeDestroy() {
+    this.client.close();
   },
 });
 </script>

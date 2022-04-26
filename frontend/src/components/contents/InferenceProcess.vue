@@ -4,12 +4,17 @@
       <v-icon small>mdi-information-outline</v-icon>
       <span>you can start/stop/manage process.</span>
       <v-spacer></v-spacer>
-      <v-icon color="succss" small @click="() => {}">mdi-plus-thick</v-icon>
+      <v-icon color="success" small @click="handleShowDialog"
+        >mdi-plus-thick</v-icon
+      >
+      <v-icon color="success" small @click="handleDiscovery"
+        >mdi-refresh</v-icon
+      >
     </v-system-bar>
     <v-data-table
       v-if="headers.length > 0"
       fixed-header
-      :height="table_height + 'px'"
+      :height="'100%'"
       class="data-table"
       :headers="headers"
       :items="data_rows"
@@ -27,59 +32,7 @@
                   header.disabled ? 'pointer-events:none;opacity:.5;' : ''
                 "
               >
-                <v-icon v-if="header.type == 'text' || header.type == 'json'">
-                  mdi-dots-horizontal
-                </v-icon>
-                <input
-                  type="checkbox"
-                  v-model="item[header.value]"
-                  :name="header.value"
-                  v-else-if="header.type == 'checkbox'"
-                  @change="() => {}"
-                />
-                <select
-                  v-else-if="header.type == 'select'"
-                  class="field-type-select"
-                  v-model="item[header.value]"
-                  @change="() => {}"
-                >
-                  <option
-                    v-for="(option, k) in header.options.items"
-                    :key="k"
-                    :value="option.value"
-                  >
-                    {{ option.text }}
-                  </option>
-                </select>
-                <div v-else-if="header.type == 'file'">
-                  <v-chip
-                    v-if="item[header.value]"
-                    class="ma-2"
-                    close
-                    color="rgba(222,222,222,0.8)"
-                    label
-                    outlined
-                    small
-                    @click="() => {}"
-                    @click:close="() => {}"
-                  >
-                    {{ item[header.value] }}
-                  </v-chip>
-                  <input
-                    v-else
-                    :type="'file'"
-                    :class="'table-edit-input file'"
-                    v-model="item[header.value]"
-                    @change="() => {}"
-                  />
-                </div>
-                <input
-                  v-else
-                  :type="'text'"
-                  :class="'table-edit-input text'"
-                  v-model="item[header.value]"
-                  @change="() => {}"
-                />
+                <span>{{ item[header.value] }}</span>
               </div>
               <div
                 v-else
@@ -107,14 +60,20 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { WebSocketClient } from '../../api/WebSocket';
+import EventBus from '../../EventBus';
 export default Vue.extend<any, any, any, any>({
   data() {
     return {
       headers: [
         {
-          type: 'text',
-          value: 'id',
+          value: 'pid',
           text: 'PID',
+        },
+        {
+          type: 'text',
+          value: 'name',
+          text: 'NAME',
         },
         {
           type: 'text',
@@ -132,13 +91,56 @@ export default Vue.extend<any, any, any, any>({
           text: 'STATUS',
         },
         {
-          value: 'action',
           text: 'ACTION',
           sortable: false,
         },
       ],
       data_rows: [],
+      watchers: [],
     };
+  },
+  methods: {
+    handleShowDialog() {
+      EventBus.$emit('toggleInference', this.watchers);
+    },
+    handleDiscovery() {
+      console.log('discovery');
+      this.client.ws.send('update');
+    },
+    updateWatcher(watchers: any) {
+      console.log('update');
+      this.watchers = watchers;
+    },
+    updateApps(apps: any) {
+      this.data_rows = apps;
+    },
+    handleSocketState(state: boolean, client: WebSocketClient) {
+      if (state) {
+        console.log('discovery');
+        this.client = client;
+        client.on('data', (data: any) => {
+          this.updateWatcher(data.watchers);
+          this.updateApps(data.apps);
+        });
+        client.ws.send('update');
+      }
+    },
+  },
+  created() {
+    EventBus.$on('updateInferenceApp', this.handleDiscovery);
+    new WebSocketClient(
+      `ws://localhost:${this.$router.currentRoute.query.port}/watcher/discovery`,
+      this.handleSocketState,
+    );
+  },
+  beforeDestroy() {
+    this.client.close();
   },
 });
 </script>
+
+<style scoped>
+.data-table {
+  height: calc(100% - 36px);
+}
+</style>

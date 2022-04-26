@@ -16,6 +16,7 @@
         <inference-process />
       </div>
     </div>
+    <inference-dialog />
   </div>
 </template>
 
@@ -23,11 +24,13 @@
 import Vue from 'vue';
 import MenuBar from '../components/MenuBar.vue';
 import InferenceProcess from '../components/contents/InferenceProcess.vue';
+import InferenceDialog from '../components/dialogs/InferenceDialog.vue';
 
 export default Vue.extend({
   components: {
     'menu-bar': MenuBar,
     'inference-process': InferenceProcess,
+    'inference-dialog': InferenceDialog,
   },
 });
 </script>

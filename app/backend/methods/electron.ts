@@ -17,12 +17,15 @@ class _WindowManager implements IWindowManager {
   }
   create = (
     path: string,
-    options: Electron.BrowserWindowConstructorOptions
+    options: Electron.BrowserWindowConstructorOptions,
+    port?: number
   ) => {
     if (this.windows[path]) return this.windows[path];
     var _window = new BrowserWindow(options);
 
-    _window.loadURL("file://" + __dirname + "/index.html#" + path);
+    _window.loadURL(
+      "file://" + __dirname + "/index.html#" + path + `?port=${port}`
+    );
     _window.webContents.openDevTools();
 
     _window.once("ready-to-show", () => {
