@@ -53,9 +53,11 @@ export default Vue.extend<any, any, any, IContentLayout>({
         state: JsonValue | undefined,
         virtual: boolean,
       ) => {
+        (state as any)['port'] = this.$router.currentRoute.query.port;
         var content = new RtspVideo({
           data: state,
-        }).$mount(container.element);
+        });
+        content.$mount(container.element);
         (container as any)['_content'] = content;
       },
     );
