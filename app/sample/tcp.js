@@ -72,7 +72,7 @@ module.exports = function (port, cluster) {
     });
   }
 
-  connect_client({ port: 5001, host: "127.0.0.1" });
+  connect_client({ port: 1234, host: "localhost" });
 
   /*
     var server = net.createServer()

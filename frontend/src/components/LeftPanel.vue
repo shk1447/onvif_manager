@@ -135,11 +135,15 @@
 <script lang="ts">
 import Vue from 'vue';
 import EventBus from '../EventBus';
-import { WebSocketClient } from '../api/WebSocket';
+import { WebSocketClient, WebSocketManager } from '../api/WebSocket';
+
 export default Vue.extend<any, any, any, any>({
   data() {
     return {
-      client: undefined,
+      manager: new WebSocketManager(
+        '127.0.0.1',
+        this.$router.currentRoute.query.port,
+      ),
       expand: true,
       name: 'Resources',
       items: [
@@ -156,8 +160,11 @@ export default Vue.extend<any, any, any, any>({
     };
   },
   methods: {
-    handleDiscovery() {
-      this.client.ws.send('update');
+    async handleDiscovery() {
+      const client: WebSocketClient = await this.manager.socket(
+        '/rtsp/discovery',
+      );
+      client.ws.send('update');
     },
     async createContent(item: any) {
       console.log(item);
@@ -183,31 +190,27 @@ export default Vue.extend<any, any, any, any>({
         },
       ] as any;
     },
-    handleRecord(item: any) {
+    async handleRecord(item: any) {
       item.record = !item.record;
-    },
-    handleSocketState(state: boolean, client: WebSocketClient) {
-      if (state) {
-        this.client = client;
-        client.on('data', (cams: any) => {
-          this.updateResource(cams);
-        });
-        client.ws.send('update');
+      const client = await this.manager.socket(`/rtsp/record/${item.name}`);
+      if (item.record) {
+        client.ws.send('start');
+      } else {
+        client.ws.send('stop');
       }
     },
   },
   created() {
-    console.log();
-    new WebSocketClient(
-      `ws://localhost:${this.$router.currentRoute.query.port}/rtsp/discovery`,
-      this.handleSocketState,
-    );
+    this.manager.socket('/rtsp/discovery').then((client: WebSocketClient) => {
+      client.on('data', this.updateResource);
+      client.ws.send('update');
+    });
   },
   mounted() {
     // this.handleDiscovery();
   },
-  beforeDestroy() {
-    this.client.close();
+  async beforeDestroy() {
+    this.manager.dispose();
   },
 });
 </script>

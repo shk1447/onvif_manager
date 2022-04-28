@@ -32,7 +32,6 @@ if (isElectron()) {
 } else {
   Vue.prototype.$electron = null;
 }
-console.log(process.env.MODE);
 
 new Vue({
   router,

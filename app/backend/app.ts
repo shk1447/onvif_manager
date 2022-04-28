@@ -6,6 +6,7 @@ import portscanner from "portscanner";
 
 let app = express();
 
+app.use("/", express.static(__dirname));
 app.use(express.json());
 
 // extend express app with app.ws()

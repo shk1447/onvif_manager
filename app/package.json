@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/main.js",
-  "type": "module",
+  "type":"module",
   "scripts": {
     "watch": "node ./builder --watch",
     "build": "node ./builder && electron-packager --platform=win32 --icon=./favicon.ico --overwrite ../dist"
@@ -50,7 +50,9 @@
     "express": "^4.17.3",
     "express-ws": "^5.0.2",
     "fluent-ffmpeg": "^2.1.2",
+    "guid": "^0.0.12",
     "http": "^0.0.1-security",
+    "moment": "^2.29.3",
     "node-onvif": "^0.1.7",
     "onvif": "^0.6.5",
     "portscanner": "^2.2.0",

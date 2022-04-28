@@ -18,11 +18,14 @@ import MenuBar from '../components/MenuBar.vue';
 import LeftPanel from '../components/LeftPanel.vue';
 import ContentLayout from '../components/ContentLayout.vue';
 
-export default Vue.extend({
+export default Vue.extend<any, any, any, any>({
   components: {
     'menu-bar': MenuBar,
     'left-panel': LeftPanel,
     'content-layout': ContentLayout,
+  },
+  data() {
+    return {};
   },
 });
 </script>
