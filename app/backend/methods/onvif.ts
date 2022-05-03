@@ -49,11 +49,11 @@ export class Onvif extends EventBus implements IOnvif {
 
   custom_discovery = () => {
     let networks: any[] = [
-      {
-        internal: false,
-        address: "170.101.20.52",
-        family: "IPv4",
-      },
+      // {
+      //   internal: false,
+      //   address: "170.101.20.52",
+      //   family: "IPv4",
+      // },
     ];
     this.cams = [];
     const interfaces = networkInterfaces();

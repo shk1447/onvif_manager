@@ -1,19 +1,17 @@
 const edge = require("@nomis51/electron-edge-js");
 
 export class ThreadController {
-  constructor() {
-    var helloWorld = edge.func(`
-      async (input) => {
-          return ".NET Welcomes " + input.ToString();
-      }
-    `);
+  constructor() {}
+
+  create() {
+    console.log("test");
+    var helloWorld = edge.func("./modules/SaigeVAD.Edge.dll");
 
     helloWorld("test", function (err: any, result: any) {
-      // console.log("aaa" + result);
+      if (err) console.log(err);
+      console.log("aaa" + result);
     });
   }
-
-  create() {}
 
   close() {}
 }

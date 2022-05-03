@@ -15,6 +15,7 @@ export class RtspService {
   constructor(app: Application) {
     app.ws(`/rtsp/stream/:name`, this.stream);
     app.ws(`/rtsp/discovery`, this.discovery);
+    app.ws(`/rtsp/image`, this.imageStream);
     app.ws(`/rtsp/record/:name`, this.record);
   }
 
@@ -22,7 +23,6 @@ export class RtspService {
     ws.on("message", (message) => {
       OnvifInstance.custom_discovery();
     });
-    ws.binaryType = "arraybuffer";
     OnvifInstance.on("discovery", (cams: any) => {
       ws.send(JSON.stringify(cams));
     });
@@ -88,6 +88,12 @@ export class RtspService {
         console.log(error);
       }
     }
+  };
+
+  imageStream = (ws: ws, req: any) => {
+    ws.on("message", (message) => {
+      console.log(message);
+    });
   };
 
   stream = (ws: ws, req: any) => {
