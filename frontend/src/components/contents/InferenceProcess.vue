@@ -43,9 +43,6 @@
                 align-items: center;
               "
               >
-                <v-icon small color="orange" @click="() => {}"
-                  >mdi-pencil</v-icon
-                >
                 <v-icon small color="red" @click="() => {}"
                   >mdi-close-thick</v-icon
                 >
@@ -60,11 +57,15 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { WebSocketClient } from '../../api/WebSocket';
+import { WebSocketClient, WebSocketManager } from '../../api/WebSocket';
 import EventBus from '../../EventBus';
 export default Vue.extend<any, any, any, any>({
   data() {
     return {
+      manager: new WebSocketManager(
+        '127.0.0.1',
+        this.$router.currentRoute.query.port,
+      ),
       headers: [
         {
           value: 'pid',
@@ -103,35 +104,26 @@ export default Vue.extend<any, any, any, any>({
     handleShowDialog() {
       EventBus.$emit('toggleInference', this.watchers);
     },
-    handleDiscovery() {
-      console.log('discovery');
-      this.client.ws.send('update');
+    async handleDiscovery() {
+      const client: WebSocketClient = await this.manager.socket(
+        '/watcher/discovery',
+      );
+      client.ws.send('update');
     },
-    updateWatcher(watchers: any) {
+    updates(data: any) {
       console.log('update');
-      this.watchers = watchers;
-    },
-    updateApps(apps: any) {
-      this.data_rows = apps;
-    },
-    handleSocketState(state: boolean, client: WebSocketClient) {
-      if (state) {
-        console.log('discovery');
-        this.client = client;
-        client.on('data', (data: any) => {
-          this.updateWatcher(data.watchers);
-          this.updateApps(data.apps);
-        });
-        client.ws.send('update');
-      }
+      this.watchers = data.watchers;
+      this.data_rows = data.apps;
     },
   },
   created() {
+    this.manager
+      .socket('/watcher/discovery')
+      .then((client: WebSocketClient) => {
+        client.on('data', this.updates);
+        client.ws.send('update');
+      });
     EventBus.$on('updateInferenceApp', this.handleDiscovery);
-    new WebSocketClient(
-      `ws://localhost:${this.$router.currentRoute.query.port}/watcher/discovery`,
-      this.handleSocketState,
-    );
   },
   beforeDestroy() {
     this.client.close();
