@@ -92,7 +92,7 @@ export class RtspService {
 
   imageStream = (ws: ws, req: any) => {
     ws.on("message", (message) => {
-      console.log(message);
+      console.log(message.toString("base64").length);
     });
   };
 

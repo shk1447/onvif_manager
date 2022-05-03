@@ -2,8 +2,6 @@ import { resolve } from "path";
 import { app, BrowserWindow, ipcMain } from "electron";
 import unhandled from "electron-unhandled";
 
-import ThreadController from "./controller/ThreadController";
-
 unhandled({
   logger: (err: Error) => {
     if (err) console.log("occured unhandled error!", err);
@@ -67,7 +65,6 @@ app.on("window-all-closed", function () {
 
 app.on("ready", () => {
   service.then((port: number) => {
-    ThreadController.create();
     process.env.port = port.toString();
     WindowManager.create(
       "/",
