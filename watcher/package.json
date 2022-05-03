@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js"
+    "start": "electron ./",
+    "build": "npm install && electron-packager --platform=win32 --extra-resource=./resources/config.json --overwrite ."
   },
   "author": "",
   "license": "ISC",
@@ -15,5 +16,9 @@
     "portscanner": "^2.2.0",
     "winston": "^3.7.2",
     "winston-daily-rotate-file": "^4.6.1"
+  },
+  "devDependencies": {
+    "electron": "^18.2.0",
+    "electron-packager": "^15.5.1"
   }
 }

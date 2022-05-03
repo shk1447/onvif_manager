@@ -16,7 +16,7 @@ export class Edge extends EventBus implements IEdge {
   controller: any;
   constructor() {
     super();
-    this.controller = edge.func("./modules/SaigeVAD.Edge.dll");
+    this.controller = edge.func("./resources/modules/SaigeVAD.Edge.dll");
   }
 
   initialize = () => {

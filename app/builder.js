@@ -60,7 +60,7 @@ var config = {
       patterns: [
         {
           from: resolve("./modules"),
-          to: resolve("../dist/modules"),
+          to: resolve("../dist/resources/modules"),
         },
       ],
     }),

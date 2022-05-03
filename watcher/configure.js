@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { program } = require("commander");
 
-program.option("-c, --conf [conf]", "set config", "./config.json");
+program.option("-c, --conf [conf]", "set config", "./resources/config.json");
 
 program.parse();
 
