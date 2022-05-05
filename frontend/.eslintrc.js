@@ -23,5 +23,11 @@ module.exports = {
     'no-unused-vars': 'off',
     'consistent-return': 'off',
     'no-restricted-globals': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
 };
