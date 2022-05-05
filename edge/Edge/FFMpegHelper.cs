@@ -60,7 +60,7 @@ namespace SaigeVAD.Edge
 
                         while (currentDirectoryPath != null)
                         {
-                            string dllDirectoryPath = Path.Combine(currentDirectoryPath, "./modules/FFMpegDLL");
+                            string dllDirectoryPath = Path.Combine(currentDirectoryPath, "./resources/modules/FFMpegDLL");
                             Console.WriteLine(dllDirectoryPath);
                             if (Directory.Exists(dllDirectoryPath))
                             {

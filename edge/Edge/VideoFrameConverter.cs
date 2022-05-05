@@ -126,7 +126,7 @@ namespace SaigeVAD.Edge
             byte_ptrArray8 targetFrameData = new byte_ptrArray8();
 
             targetFrameData.UpdateFrom(this.temporaryFrameData);
-
+            
             int_array8 targetFrameLineSize = new int_array8();
 
             targetFrameLineSize.UpdateFrom(this.temporaryFrameLineSize);

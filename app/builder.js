@@ -29,12 +29,14 @@ _package.scripts = {
   start: "electron ./main.js",
 };
 
+var target = "dist";
+
 var config = {
   watch: watch,
   entry: resolve("./backend/main.ts"),
   target: "node",
   output: {
-    path: resolve("../dist"),
+    path: resolve(`../${target}`),
     filename: "./main.js",
   },
   resolve: {
@@ -60,7 +62,7 @@ var config = {
       patterns: [
         {
           from: resolve("./modules"),
-          to: resolve("../dist/resources/modules"),
+          to: resolve(`../${target}/resources/modules`),
         },
       ],
     }),
@@ -72,12 +74,12 @@ spinner.start();
 var child, installer, builder;
 var compiler = webpack(config, (err, stats) => {
   if (err) {
-    // console.log(err);
+    console.log(err);
   }
   console.error(stats.compilation.errors);
   console.log(stats.compilation.errors.length);
   fs.writeFileSync(
-    resolve("../dist/package.json"),
+    resolve(`../${target}/package.json`),
     JSON.stringify(_package, null, 2)
   );
   spinner.stop();
@@ -115,7 +117,7 @@ if (watch) {
   );
   compiler.hooks.afterDone.tap("my-plugin", async () => {
     installer = spawnSync("npm.cmd", ["install"], {
-      cwd: "../dist",
+      cwd: `../${target}`,
     });
     console.log(installer.stdout.toString("utf-8"));
 
@@ -131,7 +133,7 @@ if (watch) {
 
       var command = "electron.cmd";
       var args = ["main.js"];
-      var options = { cwd: "../dist" };
+      var options = { cwd: `../${target}` };
       child = spawn(command, args, options);
 
       child.stdout.pipe(
