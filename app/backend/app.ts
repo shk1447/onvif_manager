@@ -33,7 +33,7 @@ export default new Promise((resolve, reject) => {
   portscanner.findAPortNotInUse(9090, (err, port) => {
     app.listen(port, "0.0.0.0", async () => {
       console.log("listen port : ", port);
-      await edgeService.initialize();
+      // await edgeService.initialize();
       resolve(port);
     });
   });

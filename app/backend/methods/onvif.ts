@@ -19,7 +19,7 @@ export class Onvif extends EventBus implements IOnvif {
     this.username = username;
     this.password = password;
 
-    onvif.Discovery.on("device", function (cam) {
+    onvif.Discovery.on("device", (cam) => {
       cam.username = username;
       cam.password = password;
       cam.connect(() => {
@@ -44,17 +44,21 @@ export class Onvif extends EventBus implements IOnvif {
 
   discovery = () => {
     this.cams = [];
-    onvif.Discovery.probe({ timeout: 2000, resolve: true }, () => {});
+    onvif.Discovery.probe(
+      { timeout: 10000, resolve: true },
+      (err: any, cams: any) => {
+        if (err) console.log(err);
+
+        if (this.cams.length !== cams.length) {
+          // this.emit("discovery", [this.cams]);
+          console.log("missing cams");
+        }
+      }
+    );
   };
 
   custom_discovery = () => {
-    let networks: any[] = [
-      // {
-      //   internal: false,
-      //   address: "170.101.20.52",
-      //   family: "IPv4",
-      // },
-    ];
+    let networks: any[] = [];
     this.cams = [];
     const interfaces = networkInterfaces();
     Object.keys(interfaces).forEach((name: string) => {
@@ -67,20 +71,35 @@ export class Onvif extends EventBus implements IOnvif {
 
     networks.forEach((item) => {
       var ipv4_arr = item.address.split(".");
-
+      console.log(this.username, this.password);
       const tryCam = (ip: string) => {
         return new Promise((resolve, reject) => {
           var cam = new onvif.Cam(
             {
               hostname: discovery_ip,
+              port: "80",
               username: this.username,
               password: this.password,
             },
             (err: any) => {
-              if (!err) resolve(cam);
-              else reject(ip);
+              // console.log(err);
             }
           );
+          console.log(cam.hostname);
+          cam.connect(() => {
+            try {
+              cam.getStreamUri(
+                { protocol: "RTSP" },
+                (err: any, stream: any) => {
+                  console.log(stream);
+                  resolve(cam);
+                }
+              );
+            } catch (error) {
+              // console.log(cam.hostname);
+              // console.log(error);
+            }
+          });
         });
       };
 
