@@ -40,6 +40,7 @@ namespace SaigeVAD.Edge
         private const int NUM_OF_BATCHES = 16;
 
         static Dictionary<string, WebSocket> sockets = new Dictionary<string, WebSocket>();
+        static Dictionary<string, Thread> threads = new Dictionary<string, Thread>();
         static WebSocket ws;
         static InferenceEngine engine;
 
@@ -98,21 +99,20 @@ namespace SaigeVAD.Edge
                         {
                             MemoryStream ms = new MemoryStream();
                             AVFrame targetFrame = converter.Convert(sourceFrame);
-                            
-                            try
-                            {
-                                var imageResults = new List<ImageResults>();
-                                var test = imageResults.ToArray();
-                                var imageBuffer = new byte[9_000_000];
-                                Marshal.Copy((IntPtr)targetFrame.data[0], imageBuffer, 0, imageBuffer.Length);
-                                var timestamp = DateTime.Now.ToLocalTime().Ticks;
-                                engine.Inference(imageBuffer, targetSize, 3, SaigeDepth.SAIGE_8U, timestamp, out test);
-                                Console.WriteLine(test.Length);
-                            }
-                            catch(Exception err)
-                            {
-                                Console.WriteLine(err.ToString());
-                            }
+
+                            System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap
+                            (
+                                targetFrame.width,
+                                targetFrame.height,
+                                targetFrame.linesize[0],
+                                System.Drawing.Imaging.PixelFormat.Format24bppRgb,
+                                (IntPtr)targetFrame.data[0]
+                            );
+
+                            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+                            byte[] byteImage = ms.ToArray();
+                            var SigBase64 = Convert.ToBase64String(byteImage);
+                            // ws.Send(byteImage);
                             frameNumber++;
                         }
                     }
