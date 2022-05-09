@@ -12,6 +12,40 @@ const stream = require("stream");
 const config = require("./configure");
 const logger = require("./logger");
 
+var tray;
+const watches = {};
+
+const buildMenu = (watchers) => {
+  var items = Object.keys(watchers).map((name) => {
+    return {
+      label: name,
+      submenu: [
+        {
+          label: "PORT NUMBER",
+          sublabel: watchers[name].port.toString(),
+          enabled: false,
+        },
+        {
+          label: "PROCESS ID",
+          sublabel: watchers[name].process.pid.toString(),
+          enabled: false,
+        },
+      ],
+    };
+  });
+
+  items.push({
+    label: "Exit",
+    click: () => {
+      electron.app.quit();
+    },
+  });
+  console.log(items);
+  const menu = electron.Menu.buildFromTemplate(items);
+
+  tray.setContextMenu(menu);
+};
+
 electron.app.on("window-all-closed", () => {
   console.log("test");
 });
@@ -21,8 +55,6 @@ electron.app.on("ready", () => {
   app.use(express.json());
 
   const ws = expressWs(app, null, {});
-
-  const watches = {};
 
   ws.app.get("/status", (req, res, next) => {
     res.status(200).send(
@@ -61,6 +93,8 @@ electron.app.on("ready", () => {
         console.log("success");
         watches[name]["process"] = child;
         watches[name]["status"] = true;
+        buildMenu(watches);
+
         res.status(200).send(
           Object.keys(watches).map((name) => {
             return {
@@ -87,6 +121,8 @@ electron.app.on("ready", () => {
 
       child.on("exit", function () {
         console.log("child exit");
+        delete watches[name];
+        buildMenu(watches);
       });
     });
   });
@@ -102,6 +138,11 @@ electron.app.on("ready", () => {
     config.port = port;
     app.listen(port, "0.0.0.0", () => {
       console.log("listen port : ", port);
+
+      tray = new electron.Tray(path.join(__dirname, "./favicon.ico"));
+      tray.setToolTip("Saige Watcher Listening : " + port);
+
+      buildMenu(watches);
     });
   });
 });

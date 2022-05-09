@@ -24,23 +24,6 @@ namespace SaigeVAD.Edge
 {
     public class Startup
     {
-        private static readonly DateTime unixBase = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-
-        private const string SAIGE_VAD_FPS = "vad/fps";
-        private const string SAIGE_VAD_ROI = "vad/roi_xywh";
-        private const string SAIGE_MODEL_NAME = "model/name";
-        private const string SAIGE_NUM_OF_BATCHES = "vad/num_batches";
-        private const string SAIGE_VAD_SCORE_THRESHOLD = "vad/score_threshold";
-        private const string SAIGE_VAD_NUM_FRAMES_IN_VCLS_BUFFER = "vad/num_frames_in_vcls_buffer";
-        private const string SAIGE_VAD_MASK_TYPE_KEY = "vad/mask_type";
-        private const string SAIGE_VAD_MAX_NUM_CONSECUTIVE_ANOMALY_TO_IGNORE = "vad/max_num_consecutive_anomaly_to_ignore";
-
-        private const string BINARY_MASK_TYPE = "Binary";
-        private const string NON_BINARY_MASK_TYPE = "Non Binary";
-        private const string NA_MASK_TYPE = "N/A";
-
-        private const int NUM_OF_BATCHES = 16;
-
         static int _port = 9090;
         static Dictionary<string, WebSocket> sockets = new Dictionary<string, WebSocket>();
         static Dictionary<string, Thread> threads = new Dictionary<string, Thread>();
