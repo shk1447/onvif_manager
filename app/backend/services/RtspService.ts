@@ -21,7 +21,7 @@ export class RtspService {
 
   discovery = (ws: ws, req: any) => {
     ws.on("message", (message) => {
-      OnvifInstance.discovery();
+      OnvifInstance.custom_discovery();
     });
     OnvifInstance.on("discovery", (cams: any) => {
       ws.send(JSON.stringify(cams));

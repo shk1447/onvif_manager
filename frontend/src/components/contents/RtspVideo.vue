@@ -5,6 +5,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import flvjs from 'flv.js';
+import { Http, WebSocketManager, WebSocketClient } from '../../api';
 interface IRtspVideo {
   name: string;
   port: string;
@@ -17,15 +18,23 @@ interface IRtspVideo {
 
 export default Vue.extend<IRtspVideo, any, any, any>({
   created() {
-    console.log(this.name);
-    // this.$electron.send('inspect/start', {
-    //   name: this.name,
-    //   stream_url: this.stream_url,
-    //   username: this.username,
-    //   password: this.password,
-    // });
+    this.manager = new WebSocketManager('127.0.0.1', this.port);
   },
   mounted() {
+    Http.post(`http://localhost:${this.port}/edge/exec/StartInference`, {
+      ip: '170.101.20.126',
+      port: 5001,
+      rtsp: {
+        url: this.stream_url,
+        username: this.username,
+        password: this.password,
+      },
+    }).then(async res => {
+      const client = await this.manager.socket(`/edge/resp/${res}`);
+      client.on('data', (data: any) => {
+        console.log(data);
+      });
+    });
     if (flvjs.isSupported()) {
       let video = this.$refs.player;
       if (video) {
@@ -46,7 +55,6 @@ export default Vue.extend<IRtspVideo, any, any, any>({
   },
   methods: {
     destroyPlayer() {
-      console.log(this.player);
       this.player.destroy();
     },
   },

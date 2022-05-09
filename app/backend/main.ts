@@ -1,5 +1,5 @@
 import { resolve } from "path";
-import { app, BrowserWindow, ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain, dialog } from "electron";
 import unhandled from "electron-unhandled";
 
 unhandled({
@@ -15,6 +15,10 @@ unhandled({
 import service from "./app";
 import { WindowManager } from "./methods/electron";
 process.env.app_path = app.getAppPath();
+
+ipcMain.handle("showDialog", async (event, args) => {
+  return dialog.showOpenDialogSync(null, {});
+});
 
 ipcMain.handle("exit", async (event, args) => {
   WindowManager.exit(args.path);

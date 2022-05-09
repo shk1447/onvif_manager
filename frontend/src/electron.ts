@@ -2,6 +2,11 @@ import electron from 'electron';
 
 import { IElectronAPI } from './shims-tsx';
 class ElectronAPI implements IElectronAPI {
+  showDialog(path: string) {
+    return electron.ipcRenderer.invoke('showDialog', {
+      path: path,
+    });
+  }
   discovery() {
     electron.ipcRenderer.invoke('discovery', {}).then(result => {
       console.log(result);

@@ -19,12 +19,15 @@ export class Edge extends EventBus implements IEdge {
     this.controller = edge.func("./resources/modules/SaigeVAD.Edge.dll");
   }
 
-  initialize = () => {
+  initialize = (uuid: string, port: number) => {
     return new Promise((resolve, reject) => {
       this.controller(
         {
-          method: "initialize",
-          sync: true,
+          uuid: uuid,
+          method: "Initialize",
+          args: {
+            port: port,
+          },
         },
         (err: any, result: any) => {
           if (err) {

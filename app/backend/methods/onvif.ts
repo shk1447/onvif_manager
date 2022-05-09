@@ -71,7 +71,6 @@ export class Onvif extends EventBus implements IOnvif {
 
     networks.forEach((item) => {
       var ipv4_arr = item.address.split(".");
-      console.log(this.username, this.password);
       const tryCam = (ip: string) => {
         return new Promise((resolve, reject) => {
           var cam = new onvif.Cam(
@@ -85,7 +84,6 @@ export class Onvif extends EventBus implements IOnvif {
               // console.log(err);
             }
           );
-          console.log(cam.hostname);
           cam.connect(() => {
             try {
               cam.getStreamUri(

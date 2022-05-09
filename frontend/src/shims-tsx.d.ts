@@ -1,6 +1,7 @@
 import Vue, { VNode } from 'vue';
 
 interface IElectronAPI {
+  showDialog: (path: string) => Promise<any>;
   createWindow: (path: string) => void;
   maximize: (path: string) => Promise<any>;
   minimize: (path: string) => void;

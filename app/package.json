@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/main.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
     "watch": "node ./builder --watch",
     "build": "node ./builder && electron-packager --platform=win32 --icon=./favicon.ico --extra-resource=./modules --overwrite ../dist"
@@ -17,6 +17,7 @@
     "@types/express-ws": "^3.0.1",
     "@types/fluent-ffmpeg": "^2.1.20",
     "@types/portscanner": "^2.1.1",
+    "@types/uuid": "^8.3.4",
     "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
@@ -56,16 +57,19 @@
     "node-onvif": "^0.1.7",
     "onvif": "^0.6.5",
     "portscanner": "^2.2.0",
+    "uuid": "^8.3.2",
     "websocket-stream": "^5.5.2",
     "ws": "^8.5.0"
   },
   "build": {
-    "extraResources": [{
-      "from": "./modules/",
-      "to": "../modules",
-      "filter": [
-        "**/*"
-      ]
-    }]
+    "extraResources": [
+      {
+        "from": "./modules/",
+        "to": "../modules",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   }
 }

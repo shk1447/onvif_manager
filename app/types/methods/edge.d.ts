@@ -5,6 +5,6 @@ interface IEdge {
 export declare class Edge extends EventBus implements IEdge {
     controller: any;
     constructor();
-    initialize: () => Promise<unknown>;
+    initialize: (uuid: string, port: number) => Promise<unknown>;
 }
 export {};

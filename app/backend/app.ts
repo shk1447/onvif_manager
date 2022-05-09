@@ -19,11 +19,11 @@ let ws = expressWebSocket(app, null, {
 });
 
 const wss = ws.getWss();
-wss.on("connection", (ws, req) => {
-  ws.on("message", (message) => {
-    console.log(message);
-  });
-});
+// wss.on("connection", (ws, req) => {
+//   ws.on("message", (message) => {
+//     console.log(message);
+//   });
+// });
 
 new RtspService(ws.app);
 new WatcherService(ws.app);
@@ -33,7 +33,7 @@ export default new Promise((resolve, reject) => {
   portscanner.findAPortNotInUse(9090, (err, port) => {
     app.listen(port, "0.0.0.0", async () => {
       console.log("listen port : ", port);
-      // await edgeService.initialize();
+      await edgeService.initialize(port);
       resolve(port);
     });
   });

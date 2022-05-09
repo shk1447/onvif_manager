@@ -35,7 +35,20 @@
                 <span>{{ item[header.value] }}</span>
               </div>
               <div
-                v-else
+                v-else-if="header.text == 'INFERENCE'"
+                style="
+                width:
+                display: flex;
+                justify-content: center;
+                align-items: center;
+              "
+              >
+                <v-icon small color="red" @click="handleSelectModel(item)"
+                  >mdi-play-network-outline</v-icon
+                >
+              </div>
+              <div
+                v-else-if="header.text == 'CLOSE'"
                 style="
                 width:
                 display: flex;
@@ -57,8 +70,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { WebSocketClient, WebSocketManager } from '../../api/WebSocket';
 import EventBus from '../../EventBus';
+import { Http, WebSocketManager, WebSocketClient } from '../../api';
 export default Vue.extend<any, any, any, any>({
   data() {
     return {
@@ -92,7 +105,11 @@ export default Vue.extend<any, any, any, any>({
           text: 'STATUS',
         },
         {
-          text: 'ACTION',
+          text: 'INFERENCE',
+          sortable: false,
+        },
+        {
+          text: 'CLOSE',
           sortable: false,
         },
       ],
@@ -101,6 +118,38 @@ export default Vue.extend<any, any, any, any>({
     };
   },
   methods: {
+    async handleSelectModel(item: any) {
+      console.log(this.$router.currentRoute.path);
+      const path = await this.$electron.showDialog(
+        this.$router.currentRoute.path,
+      );
+
+      Http.post(
+        `http://localhost:${this.$router.currentRoute.query.port}/edge/exec/SetModel`,
+        {
+          ip: item.ip,
+          port: item.port,
+          path: path[0],
+        },
+      ).then(async res => {
+        console.log(res);
+        const client = await this.manager.socket(`/edge/resp/${res}`);
+        client.on('data', (data: any) => {
+          console.log(data);
+        });
+      });
+      console.log(item);
+    },
+    handleInference() {
+      // Http.post(`http://localhost:${this.port}/edge/exec/inference`, {
+      //   path: path,
+      // }).then(async res => {
+      //   const client = await this.manager.socket(`/edge/resp/${res}`);
+      //   client.on('data', (data: any) => {
+      //     console.log(data);
+      //   });
+      // });
+    },
     handleShowDialog() {
       EventBus.$emit('toggleInference', this.watchers);
     },
@@ -114,6 +163,21 @@ export default Vue.extend<any, any, any, any>({
       console.log('update');
       this.watchers = data.watchers;
       this.data_rows = data.apps;
+      this.data_rows.map((app: any) => {
+        Http.post(
+          `http://localhost:${this.$router.currentRoute.query.port}/edge/exec/ConnectEngine`,
+          {
+            ip: app.ip,
+            port: app.port,
+          },
+        ).then(async res => {
+          console.log(res);
+          const client = await this.manager.socket(`/edge/resp/${res}`);
+          client.on('data', (data: any) => {
+            console.log(data);
+          });
+        });
+      });
     },
   },
   created() {
