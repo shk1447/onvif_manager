@@ -17,24 +17,7 @@ interface IRtspVideo {
 }
 
 export default Vue.extend<IRtspVideo, any, any, any>({
-  created() {
-    this.manager = new WebSocketManager('127.0.0.1', this.port);
-  },
   mounted() {
-    Http.post(`http://localhost:${this.port}/edge/exec/StartInference`, {
-      ip: '170.101.20.126',
-      port: 5001,
-      rtsp: {
-        url: this.stream_url,
-        username: this.username,
-        password: this.password,
-      },
-    }).then(async res => {
-      const client = await this.manager.socket(`/edge/resp/${res}`);
-      client.on('data', (data: any) => {
-        console.log(data);
-      });
-    });
     if (flvjs.isSupported()) {
       let video = this.$refs.player;
       if (video) {

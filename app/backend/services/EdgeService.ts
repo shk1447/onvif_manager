@@ -49,7 +49,7 @@ export class EdgeService {
     
     5. browser에서 해당 guid로 웹소켓 연결하여 비동기 응답 기다림.
     */
-    const uuid = uuidv4();
+    const uuid = req.query.uuid ? req.query.uuid : uuidv4();
     const method = req.params.name;
     EdgeInstance.controller(
       {

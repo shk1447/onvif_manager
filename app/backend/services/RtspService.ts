@@ -10,7 +10,6 @@ import { exec, spawn, ChildProcessWithoutNullStreams } from "child_process";
 // 향후 Onvif 생성자도 api로 변경 필요.
 import { Onvif } from "../methods/onvif";
 const OnvifInstance = new Onvif("admin", "admin1357");
-
 export class RtspService {
   constructor(app: Application) {
     app.ws(`/rtsp/stream/:name`, this.stream);

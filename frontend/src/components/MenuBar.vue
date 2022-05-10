@@ -16,7 +16,7 @@
       <my-theme style="height: 100%">
         <hsc-menu-bar style="height: 100%; border-radius: 0 0 4pt 0">
           <hsc-menu-bar-item label="Media" class="menu-item-wrapper">
-            <hsc-menu-item label="File">
+            <hsc-menu-item label="Group">
               <hsc-menu-item label="Save" value="Save" />
               <hsc-menu-item label="Load" value="Load" />
             </hsc-menu-item>

@@ -75,6 +75,7 @@ import { Http, WebSocketManager, WebSocketClient } from '../../api';
 export default Vue.extend<any, any, any, any>({
   data() {
     return {
+      shared_id: '',
       manager: new WebSocketManager(
         '127.0.0.1',
         this.$router.currentRoute.query.port,
@@ -130,6 +131,7 @@ export default Vue.extend<any, any, any, any>({
           ip: item.ip,
           port: item.port,
           path: path[0],
+          shared_id: this.shared_id,
         },
       ).then(async res => {
         console.log(res);
@@ -170,12 +172,18 @@ export default Vue.extend<any, any, any, any>({
             ip: app.ip,
             port: app.port,
           },
+          {},
+          {
+            uuid: 'test',
+          },
         ).then(async res => {
           console.log(res);
           const client = await this.manager.socket(`/edge/resp/${res}`);
           client.on('data', (data: any) => {
             console.log(data);
           });
+          this.shared_id = res;
+          (window as any).shared_id = res;
         });
       });
     },

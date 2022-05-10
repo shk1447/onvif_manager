@@ -103,15 +103,15 @@
             <template v-slot:activator="{ on }">
               <v-icon
                 color="hsla(0, 0%, 100%, 0.85)"
-                @click="handleRecord(item)"
+                @click="handleDetect(item)"
                 v-on="on"
                 small
-                :class="item.record ? 'recording' : ''"
+                :class="item.detect ? 'detecting' : ''"
                 style="margin-right: 4px"
                 >mdi-record-circle-outline</v-icon
               >
             </template>
-            <span>Record</span>
+            <span>Detect</span>
           </v-tooltip>
 
           <!-- <v-tooltip right v-if="item.id != 'root'">
@@ -135,7 +135,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import EventBus from '../EventBus';
-import { WebSocketClient, WebSocketManager } from '../api/WebSocket';
+import { Http, WebSocketManager, WebSocketClient } from '../api';
 
 export default Vue.extend<any, any, any, any>({
   data() {
@@ -175,6 +175,7 @@ export default Vue.extend<any, any, any, any>({
     updateResource(data: any) {
       var rtspVideos = data.map((item: any) => {
         item.record = false;
+        item.detect = false;
         return item;
       }) as any;
       this.children = [
@@ -197,6 +198,45 @@ export default Vue.extend<any, any, any, any>({
         client.ws.send('start');
       } else {
         client.ws.send('stop');
+      }
+    },
+    async handleDetect(item: any) {
+      if (item.detect) {
+        Http.post(
+          `http://localhost:${this.$router.currentRoute.query.port}/edge/exec/ThreadExit`,
+          {},
+          {},
+          { uuid: item.thread_id },
+        ).then(async res => {
+          const client = await this.manager.socket(`/edge/resp/${res}`);
+          client.on('data', (data: any) => {
+            console.log(data);
+          });
+          item.detect = !item.detect;
+        });
+      } else {
+        Http.post(
+          `http://localhost:${this.$router.currentRoute.query.port}/edge/exec/StartInference`,
+          {
+            ip: '170.101.20.126',
+            port: 5001,
+            rtsp: {
+              url: item.stream_url,
+              username: item.username,
+              password: item.password,
+            },
+            shared_id: 'test',
+          },
+        ).then(async res => {
+          const client = await this.manager.socket(`/edge/resp/${res}`);
+          client.on('data', (data: any) => {
+            data.map((item: any) => {
+              console.log(item.IsNormal);
+            });
+          });
+          item.detect = !item.detect;
+          item.thread_id = res;
+        });
       }
     },
   },
@@ -254,7 +294,7 @@ export default Vue.extend<any, any, any, any>({
   visibility: visible;
 }
 
-.recording {
+.detecting {
   animation-name: blink;
   animation-duration: 1s;
   animation-iteration-count: infinite;

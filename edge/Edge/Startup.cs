@@ -19,6 +19,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using WatsonTcp;
+using System.Text;
 
 namespace SaigeVAD.Edge
 {
@@ -26,9 +27,7 @@ namespace SaigeVAD.Edge
     {
         static int _port = 9090;
         static Dictionary<string, WebSocket> sockets = new Dictionary<string, WebSocket>();
-        static Dictionary<string, Thread> threads = new Dictionary<string, Thread>();
-        static Dictionary<string, WatsonTcpClient> watsons = new Dictionary<string, WatsonTcpClient>();
-        private event EventHandler<MessageReceivedEventArgs> MessageHandler;
+        static Dictionary<string, dynamic> shared = new Dictionary<string, dynamic>();
 
 
         public async Task<object> Invoke(dynamic input)
@@ -72,126 +71,151 @@ namespace SaigeVAD.Edge
 
         private void ConnectEngine(string uuid, dynamic args)
         {
+            if (sockets.ContainsKey(uuid)) return;
+
             var ip = (string)args.ip;
             var port = (int)args.port;
             var ws_url = "ws://127.0.0.1:" + _port + "/edge/async/" + uuid;
             var ws = new WebSocket(ws_url);
-            Console.WriteLine("ws url : " + ws_url);
 
-            ws.OnMessage += (object sender, MessageEventArgs e) =>
+            WatsonTcpClient client = default;
+            EventHandler<ConnectionEventArgs> connectedHandler = async (object sender, ConnectionEventArgs e) =>
             {
-            };
-            ws.OnOpen += (object sender, EventArgs e) =>
-            {
-                Console.WriteLine("ws open");
-                if (!watsons.ContainsKey(ip+port))
+                if(ws.IsAlive)
                 {
-                    Console.WriteLine(ip + port);
-                    var client = new WatsonTcpClient(ip, port);
-                    client.Settings.NoDelay = true;
-                    client.Events.ServerConnected += async (object _sender, ConnectionEventArgs _e) =>
-                    {
-                        Console.WriteLine("connect watson");
-                        watsons.Add(ip + port, client);
-                        var message = JsonConvert.SerializeObject(new Dictionary<object, object>()
+                    var message = JsonConvert.SerializeObject(new Dictionary<object, object>()
                         {
                             { "result", true }
                         });
-                        ws.Send(message);
-                    };
-
-                    client.Events.MessageReceived += Events_MessageReceived;
-
-                    client.Events.ServerDisconnected += async (object _sender, DisconnectionEventArgs _e) =>
-                    {
-                        watsons.Remove(ip + port);
-                        var message = JsonConvert.SerializeObject(new Dictionary<object, object>()
-                        {
-                            { "result", false }
-                        });
-                        ws.Send(message);
-                    };
-                    client.Connect();
-                } else
-                {
-                    var message = JsonConvert.SerializeObject(new Dictionary<object, object>()
-                    {
-                        { "result", true }
-                    });
                     ws.Send(message);
                 }
             };
-            ws.OnClose += (object sender, CloseEventArgs e) =>
+            EventHandler<DisconnectionEventArgs> disconnectHandler = async (object sender, DisconnectionEventArgs e) =>
             {
-
+                var message = JsonConvert.SerializeObject(new Dictionary<object, object>()
+                        {
+                            { "result", false }
+                        });
+                ws.Send(message);
             };
-            ws.ConnectAsync();
-        }
+            EventHandler<MessageReceivedEventArgs> messageHandler = async (object sender, MessageReceivedEventArgs e) =>
+            {
+                if (e.Metadata.TryGetValue("Response", out object value))
+                {
+                    string requestName = (string)value;
+                    Console.WriteLine(requestName + uuid);
+                    switch (requestName)
+                    {
+                        case "frameAnalysed":
+                            string data = Encoding.Default.GetString(e.Data);
+                            try
+                            {
+                                ws.Send(data);
+                            }
+                            catch(Exception err)
+                            {
+                                Console.WriteLine(err.ToString());
+                            }
+                            
+                            break;
 
-        private void Events_MessageReceived(object sender, MessageReceivedEventArgs e)
-        {
-            MessageHandler.Invoke(sender, e);
+                        case "freeRoi":
+
+                            break;
+                    }
+                }
+            };
+
+            EventHandler openHandler = default;
+            EventHandler<CloseEventArgs> closeHandler = default;
+
+            openHandler = (object sender, EventArgs e) =>
+            {
+                client = new WatsonTcpClient(ip, port);
+
+                sockets.Add(uuid, ws);
+                shared.Add(uuid, client);
+
+                client.Settings.NoDelay = true;
+
+                client.Events.ServerConnected += connectedHandler;
+                client.Events.MessageReceived += messageHandler;
+                client.Events.ServerDisconnected += disconnectHandler;
+
+                client.Connect();
+
+                var message = JsonConvert.SerializeObject(new Dictionary<object, object>()
+                {
+                    { "result", true }
+                });
+                ws.Send(message);
+            };
+
+            closeHandler = (object sender, CloseEventArgs e) =>
+            {
+                client.Events.ServerConnected -= connectedHandler;
+                client.Events.MessageReceived -= messageHandler;
+                client.Events.ServerDisconnected -= disconnectHandler;
+                ws.OnOpen -= openHandler;
+                ws.OnClose -= closeHandler;
+
+                client.Disconnect();
+                client.Dispose();
+                sockets.Remove(uuid);
+                shared.Remove(uuid);
+            };
+            ws.OnOpen += openHandler;
+            ws.OnClose += closeHandler;
+
+            ws.ConnectAsync();
         }
 
         private void SetModel(string uuid, dynamic args)
         {
-            Console.WriteLine("set model : " + uuid);
-            var ip = (string)args.ip;
-            var port = (int)args.port;
+            if (sockets.ContainsKey(uuid)) return;
+
             var path = (string)args.path;
+            var shared_id = (string)args.shared_id;
 
             var ws_url = "ws://127.0.0.1:" + _port + "/edge/async/" + uuid;
             var ws = new WebSocket(ws_url);
-            Console.WriteLine("ws url : " + ws_url);
-
-            ws.OnMessage += (object sender, MessageEventArgs e) =>
+            EventHandler openHandler = default;
+            EventHandler<CloseEventArgs> closeHandler = default;
+            openHandler = (object sender, EventArgs e) =>
             {
-            };
-            ws.OnOpen += (object sender, EventArgs e) =>
-            {
-                Console.WriteLine("ws open : " + uuid);
-                var thread = new Thread(() =>
-                {
-                    Console.WriteLine("thread start : " + path);
-                    
-                    Console.WriteLine("edge : " + path);
-                    try
-                    {
-                        if(watsons.ContainsKey(ip+port))
-                        {
-                            var client = watsons[ip + port];
-
-                            var metadata = new Dictionary<object, object>();
-                            metadata.Add("Request", "Initialization");
-                            metadata.Add("newModel", true);
-                            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
-                            {
-                                SyncResponse response = client.SendAndWait(60_000, stream.Length, stream, metadata);
-                                Dictionary<object, object> data = new Dictionary<object, object>();
-
-                                data.Add("result", response.Data[0]);
-                                var message = JsonConvert.SerializeObject(data);
-                                ws.Send(message);
-                            }
-                        }
-                    }
-                    catch(Exception err)
-                    {
-                        Console.WriteLine(err.ToString());
-                    }
-
-                });
-
                 sockets.Add(uuid, ws);
-                threads.Add(uuid, thread);
+                var client = shared[shared_id] as WatsonTcpClient;
+                try
+                {
+                    var metadata = new Dictionary<object, object>();
+                    metadata.Add("Request", "Initialization");
+                    metadata.Add("newModel", true);
+                    using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+                    {
+                        SyncResponse response = client.SendAndWait(60_000, stream.Length, stream, metadata);
+                        Dictionary<object, object> data = new Dictionary<object, object>();
 
-                thread.Start();
+                        data.Add("result", response.Data[0]);
+                        var message = JsonConvert.SerializeObject(data);
+                        ws.Send(message);
+                    }
+                }
+                catch (Exception err)
+                {
+                    Console.WriteLine(err.ToString());
+                }
             };
 
-            ws.OnClose += (object sender, CloseEventArgs e) =>
+            closeHandler = (object sender, CloseEventArgs e) =>
             {
-
+                ws.OnOpen -= openHandler;
+                ws.OnClose -= closeHandler;
+                sockets.Remove(uuid);
             };
+
+            ws.OnOpen += openHandler;
+            ws.OnClose += closeHandler;
+
             ws.ConnectAsync();
         }
 
@@ -202,201 +226,140 @@ namespace SaigeVAD.Edge
 
         private void StartInference(string uuid, dynamic args)
         {
-            Console.WriteLine("start inference");
+            if (sockets.ContainsKey(uuid)) return;
+
             var ip = (string)args.ip;
             var port = (int)args.port;
             var rtsp = (dynamic)args.rtsp;
+            var shared_id = (string)args.shared_id;
+            var shared_list = shared_id.Split(',');
 
             var ws_url = "ws://127.0.0.1:" + _port + "/edge/async/" + uuid;
             var ws = new WebSocket(ws_url);
-
-            ws.OnMessage += (object sender, MessageEventArgs e) =>
+            RtspClient rtspClient = default;
+            EventHandler openHandler = default;
+            EventHandler<CloseEventArgs> closeHandler = default;
+            Thread thread = default;
+            CancellationTokenSource tokenSource = default;
+            var client = shared[shared_id] as WatsonTcpClient;
+            const byte H264IFRAME_CODE = 5;
+            const byte H264PFRAME_CODE = 7;
+            EventHandler<RawFrame> frameReceivedHandler = (object __sender, RawFrame frame) =>
             {
-            };
-            ws.OnOpen += (object sender, EventArgs e) =>
-            {
-                Console.WriteLine("ws open");
-                const byte H264IFRAME_CODE = 5;
-                const byte H264PFRAME_CODE = 7;
-                var thread = new Thread(async () =>
+                try
                 {
-                    try
+                    if (frame is RawH264Frame h264frame)
                     {
-                        if(watsons.ContainsKey(ip + port))
+                        int bufferLen;
+                        byte[] buffer;
+
+                        if (h264frame is RawH264IFrame iframe)
                         {
-                            var client = watsons[ip + port];
-                            MessageHandler += (object _sender, MessageReceivedEventArgs _e) =>
-                            {
-                                Console.WriteLine(_e.Metadata);
-                            };
+                            bufferLen = 1 + 4 + 4 + iframe.FrameSegment.Count + iframe.SpsPpsSegment.Count + sizeof(long);
+                            buffer = new byte[bufferLen];
+                            buffer[0] = H264IFRAME_CODE;
+                            byte[] tickBytes = BitConverter.GetBytes(iframe.Timestamp.Ticks);
+                            tickBytes.CopyTo(buffer, 1);
+                            byte[] fsBytes = BitConverter.GetBytes(iframe.FrameSegment.Count);
+                            fsBytes.CopyTo(buffer, 9);
+                            byte[] spsBytes = BitConverter.GetBytes(iframe.SpsPpsSegment.Count);
+                            spsBytes.CopyTo(buffer, 13);
 
-                            var _metadata = new Dictionary<object, object>();
-                            _metadata.Add("Request", "Start");
-                            SyncResponse _response = client.SendAndWait(60_000, string.Empty, _metadata);
+                            var source = iframe.FrameSegment;
+                            Buffer.BlockCopy(source.Array, source.Offset, buffer, 17, source.Count);
+                            source = iframe.SpsPpsSegment;
+                            var startToWrite = 17 + iframe.FrameSegment.Count;
+                            Buffer.BlockCopy(source.Array, source.Offset, buffer, startToWrite, source.Count);
+                            var metadata = new Dictionary<object, object>(5);
+                            metadata.Add("Request", "NextFrame");
+                            metadata.Add("type", string.Empty);
+                            metadata.Add("seg1", string.Empty);
+                            metadata.Add("seg2", string.Empty);
+                            metadata.Add("en", "h264");
+                            client.Send(buffer, metadata);
+                        }
+                        else if (h264frame is RawH264PFrame pframe)
+                        {
+                            bufferLen = 1 + 4 + frame.FrameSegment.Count + sizeof(long);
+                            buffer = new byte[bufferLen];
+                            buffer[0] = H264PFRAME_CODE;
+                            byte[] tickBytes = BitConverter.GetBytes(pframe.Timestamp.Ticks);
+                            tickBytes.CopyTo(buffer, 1);
+                            byte[] fsBytes = BitConverter.GetBytes(pframe.FrameSegment.Count);
+                            fsBytes.CopyTo(buffer, 9);
 
-                            var conn_params = new ConnectionParameters(new Uri(rtsp.url), new NetworkCredential(rtsp.username, rtsp.password));
-                            var rtspClient = new RtspClient(conn_params);
-                            rtspClient.FrameReceived += (object __sender, RawFrame frame) =>
-                            {
-                                if (frame is RawH264Frame h264frame)
-                                {
-                                    int bufferLen;
-                                    byte[] buffer;
+                            var source = pframe.FrameSegment;
+                            Buffer.BlockCopy(source.Array, source.Offset, buffer, 13, source.Count);
 
-                                    if (h264frame is RawH264IFrame iframe)
-                                    {
-                                        bufferLen = 1 + 4 + 4 + iframe.FrameSegment.Count + iframe.SpsPpsSegment.Count + sizeof(long);
-                                        buffer = new byte[bufferLen];
-                                        buffer[0] = H264IFRAME_CODE;
-                                        byte[] tickBytes = BitConverter.GetBytes(iframe.Timestamp.Ticks);
-                                        tickBytes.CopyTo(buffer, 1);
-                                        byte[] fsBytes = BitConverter.GetBytes(iframe.FrameSegment.Count);
-                                        fsBytes.CopyTo(buffer, 9);
-                                        byte[] spsBytes = BitConverter.GetBytes(iframe.SpsPpsSegment.Count);
-                                        spsBytes.CopyTo(buffer, 13);
-
-                                        var source = iframe.FrameSegment;
-                                        Buffer.BlockCopy(source.Array, source.Offset, buffer, 17, source.Count);
-                                        source = iframe.SpsPpsSegment;
-                                        var startToWrite = 17 + iframe.FrameSegment.Count;
-                                        Buffer.BlockCopy(source.Array, source.Offset, buffer, startToWrite, source.Count);
-                                        var metadata = new Dictionary<object, object>(5);
-                                        metadata.Add("Request", "NextFrame");
-                                        metadata.Add("type", string.Empty);
-                                        metadata.Add("seg1", string.Empty);
-                                        metadata.Add("seg2", string.Empty);
-                                        metadata.Add("en", "h264");
-                                        Console.WriteLine(buffer.Length);
-                                        client.Send(buffer, metadata);
-                                    }
-                                    else if (h264frame is RawH264PFrame pframe)
-                                    {
-                                        bufferLen = 1 + 4 + frame.FrameSegment.Count + sizeof(long);
-                                        buffer = new byte[bufferLen];
-                                        buffer[0] = H264PFRAME_CODE;
-                                        byte[] tickBytes = BitConverter.GetBytes(pframe.Timestamp.Ticks);
-                                        tickBytes.CopyTo(buffer, 1);
-                                        byte[] fsBytes = BitConverter.GetBytes(pframe.FrameSegment.Count);
-                                        fsBytes.CopyTo(buffer, 9);
-
-                                        var source = pframe.FrameSegment;
-                                        Buffer.BlockCopy(source.Array, source.Offset, buffer, 13, source.Count);
-
-                                        var metadata = new Dictionary<object, object>(5);
-                                        metadata.Add("Request", "NextFrame");
-                                        metadata.Add("type", string.Empty);
-                                        metadata.Add("seg1", string.Empty);
-                                        metadata.Add("seg2", string.Empty);
-                                        metadata.Add("en", "h264");
-                                        Console.WriteLine(buffer.Length);
-                                        client.Send(buffer, metadata);
-                                    }
-
-                                }
-                            };
-                            var tokenSource = new CancellationTokenSource();
-                            await rtspClient.ConnectAsync(tokenSource.Token);
-                            await rtspClient.ReceiveAsync(tokenSource.Token);
-                            Console.WriteLine("thread inference");
+                            var metadata = new Dictionary<object, object>(5);
+                            metadata.Add("Request", "NextFrame");
+                            metadata.Add("type", string.Empty);
+                            metadata.Add("seg1", string.Empty);
+                            metadata.Add("seg2", string.Empty);
+                            metadata.Add("en", "h264");
+                            client.Send(buffer, metadata);
                         }
                     }
-                    catch(Exception err)
-                    {
-                        Console.WriteLine(err.ToString());
-                    }
-                });
-
-                sockets.Add(uuid, ws);
-                threads.Add(uuid, thread);
-
-                thread.Start();
-            };
-
-            ws.OnClose += (object sender, CloseEventArgs e) =>
-            {
-
-            };
-            ws.ConnectAsync();
-        }
-
-        private unsafe void StreamVideo(string uuid, dynamic args)
-        {
-            var url = (string)args.url;
-            var ws = new WebSocket("ws://127.0.0.1:"+_port+"/edge/async/"+uuid);
-
-            ws.OnMessage += (object sender, MessageEventArgs e) =>
-            {
-            };
-            ws.OnOpen += (object sender, EventArgs e) =>
-            {
-                var thread = new Thread(() =>
+                }
+                catch(Exception err)
                 {
-                    Console.WriteLine("start decoding process");
-                    try
-                    {
-                        using (VideoStreamDecoder decoder = new VideoStreamDecoder(url))
-                        {
-                            IReadOnlyDictionary<string, string> contextInfoDictionary = decoder.GetContextInfoDictionary();
-
-                            contextInfoDictionary.ToList().ForEach(x => Console.WriteLine($"{x.Key} = {x.Value}"));
-
-                            Size sourceSize = decoder.FrameSize;
-                            AVPixelFormat sourcePixelFormat = decoder.PixelFormat;
-                            Size targetSize = sourceSize;
-                            AVPixelFormat targetPixelFormat = AVPixelFormat.AV_PIX_FMT_BGR24;
-                            using (VideoFrameConverter converter = new VideoFrameConverter(sourceSize, sourcePixelFormat, targetSize, targetPixelFormat))
-                            {
-                                int frameNumber = 0;
-
-                                while (decoder.TryDecodeNextFrame(out AVFrame sourceFrame) && true)
-                                {
-                                    MemoryStream ms = new MemoryStream();
-                                    AVFrame targetFrame = converter.Convert(sourceFrame);
-
-                                    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap
-                                    (
-                                        targetFrame.width,
-                                        targetFrame.height,
-                                        targetFrame.linesize[0],
-                                        System.Drawing.Imaging.PixelFormat.Format24bppRgb,
-                                        (IntPtr)targetFrame.data[0]
-                                    );
-
-                                    bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                                    byte[] byteImage = ms.ToArray();
-                                    var SigBase64 = Convert.ToBase64String(byteImage);
-                                    Dictionary<string, string> data = new Dictionary<string, string>();
-                                    data.Add("stream", SigBase64);
-                                    var message = JsonConvert.SerializeObject(data);
-                                    ws.Send(message);
-                                    frameNumber++;
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        Console.WriteLine(err.ToString());
-                    }
-                });
-                sockets.Add(uuid, ws);
-                threads.Add(uuid, thread);
-
-                thread.Start();
+                    Console.WriteLine("Right!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + err.ToString());
+                }
             };
-            ws.OnClose += (object sender, CloseEventArgs e) =>
+
+            openHandler = async (object sender, EventArgs e) =>
             {
-                
+                var _metadata = new Dictionary<object, object>();
+                _metadata.Add("Request", "Start");
+                SyncResponse _response = client.SendAndWait(60_000, string.Empty, _metadata);
+                var conn_params = new ConnectionParameters(new Uri(rtsp.url), new NetworkCredential(rtsp.username, rtsp.password));
+                rtspClient = new RtspClient(conn_params);
+                sockets.Add(uuid, ws);
+                shared.Add(uuid, rtspClient);
+                rtspClient.FrameReceived += frameReceivedHandler;
+                tokenSource = new CancellationTokenSource();
+                await rtspClient.ConnectAsync(tokenSource.Token);
+                await rtspClient.ReceiveAsync(tokenSource.Token);                
             };
+
+            closeHandler = (object sender, CloseEventArgs e) =>
+            {
+                Console.WriteLine(uuid + " : Closed!?!?!?");
+                try
+                {
+                    ws.OnOpen -= openHandler;
+                    Console.WriteLine("open handler");
+                    ws.OnClose -= closeHandler;
+                    Console.WriteLine("close handler");
+                    Console.WriteLine("dispose");
+                    rtspClient.FrameReceived -= frameReceivedHandler;
+
+                    Console.WriteLine("receive handler");
+                    Console.WriteLine("completed");
+                    sockets.Remove(uuid);
+                    shared.Remove(uuid);
+                } catch(Exception err)
+                {
+                    Console.WriteLine("aaaaaaaaaaa"+err.ToString());
+                }
+            };
+
+            ws.OnOpen += openHandler;
+            ws.OnClose += closeHandler;
+
             ws.ConnectAsync();
         }
 
         private void ThreadExit(string uuid)
         {
-            if(threads.ContainsKey(uuid))
+            
+            if(sockets.ContainsKey(uuid))
             {
                 sockets[uuid].Close();
-                threads[uuid].Abort();
+                Console.WriteLine(uuid + " : Close");
+            } else
+            {
+                Console.WriteLine(uuid + " : WHy not!?!?!?");
             }
         }
     }

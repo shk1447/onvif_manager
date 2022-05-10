@@ -6,18 +6,25 @@ import { WindowManager } from "./electron";
 interface IOnvif {
   username: string;
   password: string;
+  discoveryPort: string;
 }
 
 export class Onvif extends EventBus implements IOnvif {
   cams: any[];
   username: string;
   password: string;
+  discoveryPort: string;
 
-  constructor(username: string, password: string) {
+  constructor(
+    username: string,
+    password: string,
+    discoveryPort: string = "80"
+  ) {
     super();
     this.cams = [];
     this.username = username;
     this.password = password;
+    this.discoveryPort = discoveryPort;
 
     onvif.Discovery.on("device", (cam) => {
       cam.username = username;
@@ -75,13 +82,15 @@ export class Onvif extends EventBus implements IOnvif {
         return new Promise((resolve, reject) => {
           var cam = new onvif.Cam(
             {
-              hostname: discovery_ip,
-              port: "80",
+              hostname: ip,
+              port: this.discoveryPort,
               username: this.username,
               password: this.password,
             },
             (err: any) => {
-              // console.log(err);
+              if (!err) {
+                console.log(ip);
+              }
             }
           );
           cam.connect(() => {
